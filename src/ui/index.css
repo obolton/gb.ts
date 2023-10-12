@@ -1,0 +1,449 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Rubik+Mono+One&display=swap');
+
+:root {
+  --border-color: #cccccc;
+  --accent-color: rgba(214, 214, 255, 1);
+}
+
+body {
+  display: flex;
+  height: 100dvh;
+  padding: 0;
+  margin: 0;
+  font-family: 'Roboto', Arial, sans-serif;
+  flex-direction: column;
+  box-sizing: border-box;
+  touch-action: pan-y;
+}
+
+h1,
+h2 {
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  font-family: 'Rubik Mono One', monospace;
+  font-size: 56px;
+  line-height: 56px;
+  width: 300px;
+  background-image: linear-gradient(165deg, #0b03aa, #8580c8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.25);
+}
+
+h2 {
+  font-size: 16px;
+  font-weight: bold;
+  color: #0b03aa;
+  margin-bottom: 10px;
+}
+
+button {
+  border: none;
+  outline: none;
+}
+
+input[type='file'] {
+  display: none;
+}
+
+table,
+tr,
+td,
+tbody {
+  border-spacing: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+main {
+  box-sizing: border-box;
+  width: 480px;
+  margin: 0 auto;
+  padding: 40px 0 0;
+  flex: 1;
+}
+
+/* Header */
+
+#header {
+  flex: 0;
+  box-sizing: border-box;
+  padding: 20px;
+  background: linear-gradient(
+    135deg,
+    var(--accent-color) 0%,
+    rgba(255, 255, 255, 1) 100%
+  );
+  border-bottom: 2px solid var(--border-color);
+}
+
+p.description {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 5px 0 0;
+  padding: 0;
+}
+
+#keyInfo {
+  display: none;
+  font-size: 16px;
+  margin-top: 30px;
+}
+
+#keyInfo td {
+  padding-right: 5px;
+}
+
+.key {
+  display: inline-block;
+  margin: 3px;
+  padding: 4px 6px;
+  min-width: 8px;
+
+  border-radius: 5px;
+  background: #d0d0e0;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+
+  font-size: 10px;
+  line-height: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+@media (min-width: 1100px) {
+  #header {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 290px;
+    height: 100%;
+    border-bottom: none;
+    border-right: 2px solid var(--border-color);
+  }
+
+  #keyInfo {
+    display: block;
+  }
+}
+
+/* Device */
+
+#device {
+  position: relative;
+  box-sizing: border-box;
+  width: 480px;
+  padding: 10px;
+  height: 100%;
+  min-height: 640px;
+  max-height: 660px;
+  user-select: none;
+  touch-action: pan-y;
+
+  border: 2px solid var(--border-color);
+  border-radius: 30px 30px 0 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(212, 212, 212, 1) 100%
+  );
+}
+
+@media (min-width: 1100px), (min-height: 900px) {
+  #device {
+    border: 2px solid var(--border-color);
+    border-radius: 30px 30px 90px 30px;
+    position: relative;
+    top: unset;
+    bottom: unset;
+  }
+
+  main {
+    padding: 40px 0;
+  }
+}
+
+#powerButton {
+  position: absolute;
+  top: -20px;
+  left: 20px;
+  width: 50px;
+  height: 20px;
+  font-size: 16px;
+  font-weight: bold;
+
+  background: var(--border-color);
+  color: #606060;
+  border-radius: 15px 15px 0 0;
+}
+
+#powerButton:disabled {
+  color: #a0a0a0;
+}
+
+/* ROM selector */
+
+#romSelectorForm {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.on #romSelectorForm {
+  display: none;
+}
+
+#romSelectorButton {
+  padding: 15px 25px;
+  background: linear-gradient(
+    0deg,
+    var(--accent-color) 0%,
+    rgba(255, 255, 255, 1) 100%
+  );
+  outline: none;
+  cursor: pointer;
+
+  color: #221ba4;
+  border: 2px solid #fff;
+  border-radius: 30px;
+  box-shadow: 0 1px 5px 2px rgba(0, 0, 0, 0.5);
+
+  font-family: 'Rubik Mono One', monospace;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Display */
+
+#displayContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 330px;
+  border-radius: 20px 20px 60px 20px;
+  background: #888888;
+  box-sizing: border-box;
+}
+
+#led {
+  position: absolute;
+  top: 120px;
+  left: 28px;
+  width: 10px;
+  height: 10px;
+  background: #222;
+  border-radius: 5px;
+}
+
+.on #led {
+  background: #ff0000;
+  box-shadow: 0 0 5px 2px rgba(255, 128, 128, 0.5);
+}
+
+#battery {
+  position: absolute;
+  font-size: 8px;
+  color: #dddddd;
+  top: 140px;
+  left: 15px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+#lcd {
+  position: relative;
+  width: 320px;
+  height: 288px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#display {
+  background: #333333;
+  width: 320px;
+  height: 288px;
+  image-rendering: pixelated;
+}
+
+/* Controls */
+
+#controls {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  height: 260px;
+  user-select: none;
+}
+
+#directionButtons {
+  position: absolute;
+  left: 10px;
+  top: 0;
+  width: 140px;
+  height: 140px;
+  border: 2px solid var(--border-color);
+  border-radius: 70px;
+}
+
+.directionButton {
+  position: absolute;
+  background: #2c2c2c;
+  width: 40px;
+  height: 40px;
+  border: none;
+}
+
+#up {
+  top: 10px;
+  left: 50px;
+  border-radius: 5px 5px 0 0;
+}
+
+#left {
+  padding: 0px;
+  top: 50px;
+  left: 10px;
+  border-radius: 5px 0 0 5px;
+}
+
+#right {
+  top: 50px;
+  right: 10px;
+  border-radius: 0 5px 5px 0;
+}
+
+#down {
+  left: 50px;
+  bottom: 10px;
+  border-radius: 0 0 5px 5px;
+}
+
+#directionCenter {
+  position: absolute;
+  background: #2c2c2c;
+  width: 44px;
+  height: 44px;
+  top: 48px;
+  left: 48px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#directionCircle {
+  border-radius: 15px;
+  width: 25px;
+  height: 25px;
+  background: #333333;
+}
+
+#actionButtonsContainer {
+  position: absolute;
+  top: 10px;
+  right: 0px;
+  transform: rotate(-30deg);
+}
+
+#actionButtons {
+  display: flex;
+  gap: 20px;
+  flex-direction: row;
+  align-items: center;
+  border-radius: 50px;
+  padding: 10px;
+  border: 2px solid var(--border-color);
+}
+
+#actionButtonLabels {
+  margin-top: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 80px;
+  justify-content: center;
+}
+
+.directionButton:active,
+.actionButton:active,
+.controlButton:active {
+  filter: brightness(150%);
+}
+
+.buttonLabel {
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #231e8c;
+  letter-spacing: 1px;
+}
+
+.actionButton {
+  width: 60px;
+  height: 60px;
+  border-radius: 30px;
+  background: #6b004b;
+  border: none;
+}
+
+#controlButtons {
+  position: absolute;
+  left: 50px;
+  right: 50px;
+  bottom: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.controlButtonContainer {
+  display: flex;
+  align-items: center;
+  transform: rotate(-30deg);
+  display: flex;
+  flex-direction: column;
+}
+
+.controlButton {
+  border-radius: 6px;
+  background: #333333;
+  width: 50px;
+  height: 15px;
+}
+
+.controlButtonContainer span {
+  margin-top: 5px;
+}
+
+/* Speaker */
+
+#speaker {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+  transform: rotate(-30deg);
+}
+
+.speakerHole {
+  width: 6px;
+  background: #999;
+  border-radius: 3px;
+  height: 50px;
+}

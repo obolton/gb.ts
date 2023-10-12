@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+  <head>
+    <title>GB.ts</title>
+    <meta charset="utf-8" />
+    <meta
+      name="description"
+      content="A web-based Game Boy emulator written in TypeScript"
+    />
+    <meta name="viewport" content="width=480,user-scalable=0" />
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <header id="header">
+      <h1>GB.ts</h1>
+      <p class="description">A web-based Game Boy emulator.</p>
+
+      <section id="keyInfo">
+        <h2>Keyboard controls</h2>
+        <table>
+          <tbody>
+            <tr>
+              <td>Start</td>
+              <td><span class="key">Enter</span></td>
+            </tr>
+            <tr>
+              <td>Select</td>
+              <td><span class="key">Space</span></td>
+            </tr>
+            <tr>
+              <td>A</td>
+              <td><span class="key">A</span></td>
+            </tr>
+            <tr>
+              <td>B</td>
+              <td><span class="key">S</span></td>
+            </tr>
+            <tr>
+              <td>Directions</td>
+              <td>
+                <span class="key">&uarr;</span><span class="key">&darr;</span
+                ><span class="key">&larr;</span><span class="key">&rarr;</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </header>
+    <main>
+      <div id="device">
+        <button type="button" id="powerButton" disabled>&#x23FB;</button>
+        <div id="displayContainer">
+          <div id="led"></div>
+          <div id="battery">Battery</div>
+          <div id="lcd">
+            <canvas id="display" width="160" height="144"></canvas>
+            <form id="romSelectorForm">
+              <label id="romSelectorButton" for="romSelectorInput"
+                >Select a ROM</label
+              >
+              <input
+                id="romSelectorInput"
+                type="file"
+                name="rom"
+                accept=".gb,.rom"
+              />
+            </form>
+          </div>
+        </div>
+
+        <div id="controls">
+          <div id="directionButtons">
+            <div id="directionCenter">
+              <div id="directionCircle"></div>
+            </div>
+            <button class="directionButton" type="button" id="up"></button>
+            <button class="directionButton" type="button" id="left"></button>
+            <button class="directionButton" type="button" id="right"></button>
+            <button class="directionButton" type="button" id="down"></button>
+          </div>
+
+          <div id="actionButtonsContainer">
+            <div id="actionButtons">
+              <button class="actionButton" type="button" id="b"></button>
+              <button class="actionButton" type="button" id="a"></button>
+            </div>
+
+            <div id="actionButtonLabels">
+              <span class="buttonLabel">B</span>
+              <span class="buttonLabel">A</span>
+            </div>
+          </div>
+
+          <div id="controlButtons">
+            <div class="controlButtonContainer">
+              <button id="select" class="controlButton" type="button"></button>
+              <span class="buttonLabel">Select</span>
+            </div>
+
+            <div class="controlButtonContainer">
+              <button class="controlButton" type="button" id="start"></button>
+              <span class="buttonLabel">Start</span>
+            </div>
+          </div>
+
+          <div id="speaker">
+            <div class="speakerHole"></div>
+            <div class="speakerHole"></div>
+            <div class="speakerHole"></div>
+            <div class="speakerHole"></div>
+            <div class="speakerHole"></div>
+            <div class="speakerHole"></div>
+          </div>
+        </div>
+      </div>
+
+      <script src="index.js"></script>
+    </main>
+  </body>
+</html>
