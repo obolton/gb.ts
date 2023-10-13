@@ -2,7 +2,8 @@
 
 :root {
   --border-color: #cccccc;
-  --accent-color: rgba(214, 214, 255, 1);
+  --heading-color: #0b03aa;
+  --accent-color: #e0e0ff;
 }
 
 body {
@@ -20,24 +21,19 @@ h1,
 h2 {
   margin: 0;
   padding: 0;
+  color: var(--heading-color);
 }
 
 h1 {
   font-family: 'Rubik Mono One', monospace;
   font-size: 56px;
   line-height: 56px;
-  width: 300px;
-  background-image: linear-gradient(165deg, #0b03aa, #8580c8 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.25);
+  text-shadow: 0px 3px 2px rgba(128, 128, 255, 0.25);
 }
 
 h2 {
   font-size: 16px;
   font-weight: bold;
-  color: #0b03aa;
   margin-bottom: 10px;
 }
 
@@ -74,12 +70,7 @@ main {
   flex: 0;
   box-sizing: border-box;
   padding: 20px;
-  background: linear-gradient(
-    135deg,
-    var(--accent-color) 0%,
-    rgba(255, 255, 255, 1) 100%
-  );
-  border-bottom: 2px solid var(--border-color);
+  background: var(--accent-color);
 }
 
 p.description {
@@ -96,17 +87,17 @@ p.description {
 }
 
 #keyInfo td {
-  padding-right: 5px;
+  padding-right: 10px;
 }
 
 .key {
   display: inline-block;
   margin: 3px;
-  padding: 4px 6px;
+  padding: 6px 10px;
   min-width: 8px;
 
   border-radius: 5px;
-  background: #d0d0e0;
+  background: #f0f0ff;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
 
   font-size: 10px;
@@ -123,8 +114,6 @@ p.description {
     top: 0;
     width: 290px;
     height: 100%;
-    border-bottom: none;
-    border-right: 2px solid var(--border-color);
   }
 
   #keyInfo {
@@ -204,16 +193,12 @@ p.description {
 
 #romSelectorButton {
   padding: 15px 25px;
-  background: linear-gradient(
-    0deg,
-    var(--accent-color) 0%,
-    rgba(255, 255, 255, 1) 100%
-  );
+  background: var(--accent-color);
   outline: none;
   cursor: pointer;
 
-  color: #221ba4;
-  border: 2px solid #fff;
+  color: var(--heading-color);
+  border: 3px solid #fff;
   border-radius: 30px;
   box-shadow: 0 1px 5px 2px rgba(0, 0, 0, 0.5);
 
@@ -221,6 +206,7 @@ p.description {
   font-size: 18px;
   font-weight: bold;
   text-align: center;
+  text-shadow: 0px 2px 2px rgba(128, 128, 255, 0.25);
 }
 
 /* Display */
@@ -379,9 +365,12 @@ p.description {
 }
 
 .directionButton:active,
-.actionButton:active,
-.controlButton:active {
+.actionButton:active {
   filter: brightness(150%);
+}
+
+.controlButton:active {
+  filter: brightness(120%);
 }
 
 .buttonLabel {
@@ -420,10 +409,10 @@ p.description {
 }
 
 .controlButton {
-  border-radius: 6px;
-  background: #333333;
+  border-radius: 8px;
+  background: #909090;
   width: 50px;
-  height: 15px;
+  height: 16px;
 }
 
 .controlButtonContainer span {
