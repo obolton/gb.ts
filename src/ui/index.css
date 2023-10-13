@@ -27,7 +27,7 @@ h2 {
 h1 {
   font-family: 'Rubik Mono One', monospace;
   font-size: 56px;
-  line-height: 56px;
+  line-height: 48px;
   text-shadow: 0px 3px 2px rgba(128, 128, 255, 0.25);
 }
 
@@ -44,6 +44,19 @@ button {
 
 input[type='file'] {
   display: none;
+}
+
+a,
+a:hover,
+a:active,
+a:visited {
+  color: #202040;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
 }
 
 table,
@@ -64,16 +77,23 @@ main {
   flex: 1;
 }
 
-/* Header */
+/* Sidebar */
 
-#header {
+#nav {
+  display: flex;
+  flex-direction: row;
   flex: 0;
-  box-sizing: border-box;
   padding: 20px;
+  box-sizing: border-box;
+  color: #202040;
   background: var(--accent-color);
 }
 
-p.description {
+#nav header {
+  flex: 1;
+}
+
+#nav p {
   font-size: 16px;
   font-weight: bold;
   margin: 5px 0 0;
@@ -81,6 +101,7 @@ p.description {
 }
 
 #keyInfo {
+  flex: 1;
   display: none;
   font-size: 16px;
   margin-top: 30px;
@@ -98,7 +119,7 @@ p.description {
 
   border-radius: 5px;
   background: #f0f0ff;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
 
   font-size: 10px;
   line-height: 10px;
@@ -107,13 +128,31 @@ p.description {
   text-align: center;
 }
 
+.githubLink {
+  display: flex;
+  flex: 0;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+}
+
 @media (min-width: 1100px) {
-  #header {
+  #nav {
     position: fixed;
+    flex-direction: column;
     left: 0;
     top: 0;
     width: 290px;
     height: 100%;
+  }
+
+  #nav header {
+    flex: 0;
   }
 
   #keyInfo {

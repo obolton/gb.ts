@@ -11,10 +11,11 @@
     <link rel="stylesheet" href="index.css" />
   </head>
   <body>
-    <header id="header">
-      <h1>GB.ts</h1>
-      <p class="description">A web-based Game Boy emulator.</p>
-
+    <nav id="nav">
+      <header>
+        <h1>GB.ts</h1>
+        <p>A web-based Game Boy emulator.</p>
+      </header>
       <section id="keyInfo">
         <h2>Keyboard controls</h2>
         <table>
@@ -45,7 +46,16 @@
           </tbody>
         </table>
       </section>
-    </header>
+      <footer>
+        <a
+          class="githubLink"
+          href="https://github.com/obolton/GB.ts"
+          target="_blank"
+          ><img class="icon" src="./github.svg" alt="GitHub" />
+          By @obolton
+        </a>
+      </footer>
+    </nav>
     <main>
       <div id="device">
         <button type="button" id="powerButton" disabled>&#x23FB;</button>
