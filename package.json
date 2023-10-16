@@ -2,13 +2,14 @@
   "name": "gb.ts",
   "version": "1.0.0",
   "description": "A web-based Game Boy emulator written in TypeScript",
+  "author": "Oliver Bolton",
+  "license": "MIT",
   "main": "src/gb.ts",
   "scripts": {
     "build": "esbuild src/ui/index.ts --bundle --outdir=public --minify",
     "start": "esbuild src/ui/index.ts --bundle --sourcemap --watch --outdir=public --servedir=public",
     "test": "jest --coverage"
   },
-  "author": "Oliver Bolton",
   "devDependencies": {
     "@types/jest": "^29.5.5",
     "@typescript-eslint/eslint-plugin": "^6.7.2",
