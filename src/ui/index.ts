@@ -105,7 +105,15 @@ const KEY_MAPPING: { [code: string]: Button } = {
     device.classList.add('on');
     powerButton.disabled = false;
     const rom = new Uint8Array(result);
-    gameboy.start(rom);
+    try {
+      gameboy.start(rom);
+    } catch (error) {
+      if (error instanceof Error) {
+        window.alert(error.message);
+        device.classList.remove('on');
+        powerButton.disabled = true;
+      }
+    }
   });
   fileInput.addEventListener('change', () => {
     const file = fileInput.files?.[0];
