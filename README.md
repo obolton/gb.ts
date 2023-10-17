@@ -16,6 +16,7 @@ A web-based Game Boy emulator, written in TypeScript.
   - MBC 1
   - MBC 2
   - MBC 3 (partial)
+  - MBC 5
 
 ## Browser support
 
