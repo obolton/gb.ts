@@ -2,6 +2,7 @@ import MBC0 from './mbc0';
 import MBC1 from './mbc1';
 import MBC2 from './mbc2';
 import MBC3 from './mbc3';
+import MBC5 from './mbc5';
 import { MEMORY_REGISTERS } from './constants';
 import { IO } from '../types';
 
@@ -30,6 +31,14 @@ export default class ExternalMemory {
       case 0x12:
       case 0x13:
         this.mbc = new MBC3(rom);
+        break;
+      case 0x19:
+      case 0x1a:
+      case 0x1b:
+      case 0x1c:
+      case 0x1d:
+      case 0x1e:
+        this.mbc = new MBC5(rom);
         break;
       default:
         throw new Error(`Unsupported MBC type: ${mbcType}`);
