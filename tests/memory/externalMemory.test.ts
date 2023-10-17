@@ -4,6 +4,7 @@ import MBC0 from '../../src/memory/mbc0';
 import MBC1 from '../../src/memory/mbc1';
 import MBC2 from '../../src/memory/mbc2';
 import MBC3 from '../../src/memory/mbc3';
+import MBC5 from '../../src/memory/mbc5';
 import MOCK_ROM from '../mocks/rom';
 
 describe('ExternalMemory', () => {
@@ -26,60 +27,32 @@ describe('ExternalMemory', () => {
       expect(externalMemory.mbc).toBeInstanceOf(MBC0);
     });
 
-    test('MBC1', () => {
+    test.each([0x01, 0x02, 0x03])('MBC1 (%i)', (mbcType) => {
       const rom = new Uint8Array(MOCK_ROM);
-      rom[MEMORY_REGISTERS.MBC_TYPE] = 0x01;
+      rom[MEMORY_REGISTERS.MBC_TYPE] = mbcType;
       const externalMemory = new ExternalMemory(rom);
       expect(externalMemory.mbc).toBeInstanceOf(MBC1);
     });
 
-    test('MBC1 + RAM', () => {
+    test.each([0x05, 0x06])('MBC2 (%i)', (mbcType) => {
       const rom = new Uint8Array(MOCK_ROM);
-      rom[MEMORY_REGISTERS.MBC_TYPE] = 0x02;
-      const externalMemory = new ExternalMemory(rom);
-      expect(externalMemory.mbc).toBeInstanceOf(MBC1);
-    });
-
-    test('MBC1 + RAM + Battery', () => {
-      const rom = new Uint8Array(MOCK_ROM);
-      rom[MEMORY_REGISTERS.MBC_TYPE] = 0x03;
-      const externalMemory = new ExternalMemory(rom);
-      expect(externalMemory.mbc).toBeInstanceOf(MBC1);
-    });
-
-    test('MBC2', () => {
-      const rom = new Uint8Array(MOCK_ROM);
-      rom[MEMORY_REGISTERS.MBC_TYPE] = 0x05;
+      rom[MEMORY_REGISTERS.MBC_TYPE] = mbcType;
       const externalMemory = new ExternalMemory(rom);
       expect(externalMemory.mbc).toBeInstanceOf(MBC2);
     });
 
-    test('MBC2 + Battery', () => {
+    test.each([0x11, 0x12, 0x13])('MBC3 (%i)', (mbcType) => {
       const rom = new Uint8Array(MOCK_ROM);
-      rom[MEMORY_REGISTERS.MBC_TYPE] = 0x06;
-      const externalMemory = new ExternalMemory(rom);
-      expect(externalMemory.mbc).toBeInstanceOf(MBC2);
-    });
-
-    test('MBC3', () => {
-      const rom = new Uint8Array(MOCK_ROM);
-      rom[MEMORY_REGISTERS.MBC_TYPE] = 0x11;
+      rom[MEMORY_REGISTERS.MBC_TYPE] = mbcType;
       const externalMemory = new ExternalMemory(rom);
       expect(externalMemory.mbc).toBeInstanceOf(MBC3);
     });
 
-    test('MBC3 + RAM', () => {
+    test.each([0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e])('MBC5 (%i)', (mbcType) => {
       const rom = new Uint8Array(MOCK_ROM);
-      rom[MEMORY_REGISTERS.MBC_TYPE] = 0x12;
+      rom[MEMORY_REGISTERS.MBC_TYPE] = mbcType;
       const externalMemory = new ExternalMemory(rom);
-      expect(externalMemory.mbc).toBeInstanceOf(MBC3);
-    });
-
-    test('MBC3 + RAM + Battery', () => {
-      const rom = new Uint8Array(MOCK_ROM);
-      rom[MEMORY_REGISTERS.MBC_TYPE] = 0x13;
-      const externalMemory = new ExternalMemory(rom);
-      expect(externalMemory.mbc).toBeInstanceOf(MBC3);
+      expect(externalMemory.mbc).toBeInstanceOf(MBC5);
     });
   });
 });
