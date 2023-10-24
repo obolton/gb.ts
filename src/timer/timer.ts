@@ -53,6 +53,8 @@ export default class Timer implements IO {
         }
 
         this.div = 0; // Any writes to DIV reset its value to 0
+        this.divCycles = 0;
+        this.timaCycles = 0;
         return;
 
       case TIMER_REGISTERS.TIMA:
