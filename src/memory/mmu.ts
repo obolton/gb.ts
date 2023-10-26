@@ -1,4 +1,4 @@
-import { MEMORY_RANGES } from './constants';
+import { MEMORY_RANGES, RAM_BANK_SIZE } from './constants';
 import { inRange } from '../utils';
 import { IO } from '../types';
 import type { Interrupt } from '../cpu/interrupts';
@@ -16,23 +16,26 @@ export default class MMU {
   hram: Uint8Array;
   ie: number;
   if: number;
+  ramBank: number;
   speed: number;
 
   constructor() {
-    this.ram = new Uint8Array(8192);
+    this.ram = new Uint8Array(32768);
     this.oam = new Uint8Array(160);
     this.hram = new Uint8Array(126);
     this.ie = 0x00;
     this.if = 0x00;
+    this.ramBank = 1;
     this.speed = 0;
   }
 
   reset() {
-    this.ram = new Uint8Array(8192);
+    this.ram = new Uint8Array(32768);
     this.oam = new Uint8Array(160);
     this.hram = new Uint8Array(126);
     this.ie = 0x00;
     this.if = 0x00;
+    this.ramBank = 1;
     this.speed = 0;
   }
 
@@ -53,12 +56,27 @@ export default class MMU {
       return this.externalMemory.read(address);
     }
 
-    if (inRange(address, MEMORY_RANGES.RAM)) {
-      return this.ram[address - MEMORY_RANGES.RAM.start];
+    if (inRange(address, MEMORY_RANGES.RAM_FIXED)) {
+      return this.ram[address - MEMORY_RANGES.RAM_FIXED.start];
     }
 
-    if (inRange(address, MEMORY_RANGES.ECHO_RAM)) {
-      return this.ram[address - MEMORY_RANGES.ECHO_RAM.start];
+    if (inRange(address, MEMORY_RANGES.RAM_SWITCHABLE)) {
+      const bank = this.ramBank & 0x07 || 1;
+      return this.ram[
+        bank * RAM_BANK_SIZE + (address - MEMORY_RANGES.RAM_SWITCHABLE.start)
+      ];
+    }
+
+    if (inRange(address, MEMORY_RANGES.ECHO_RAM_FIXED)) {
+      return this.ram[address - MEMORY_RANGES.ECHO_RAM_FIXED.start];
+    }
+
+    if (inRange(address, MEMORY_RANGES.ECHO_RAM_SWITCHABLE)) {
+      const bank = this.ramBank & 0x07 || 1;
+      return this.ram[
+        bank * RAM_BANK_SIZE +
+          (address - MEMORY_RANGES.ECHO_RAM_SWITCHABLE.start)
+      ];
     }
 
     if (inRange(address, MEMORY_RANGES.OAM)) {
@@ -84,6 +102,10 @@ export default class MMU {
 
       if (inRange(address, MEMORY_RANGES.LCD) && this.ppu) {
         return this.ppu.read(address);
+      }
+
+      if (address === MEMORY_RANGES.SVBK.start) {
+        return this.ramBank;
       }
 
       if (address === MEMORY_RANGES.IF.start) {
@@ -115,6 +137,7 @@ export default class MMU {
 
     if (inRange(address, MEMORY_RANGES.ROM)) {
       this.externalMemory.write(address, value);
+      return;
     }
 
     if (inRange(address, MEMORY_RANGES.VRAM) && this.ppu) {
@@ -127,13 +150,30 @@ export default class MMU {
       return;
     }
 
-    if (inRange(address, MEMORY_RANGES.RAM)) {
-      this.ram[address - MEMORY_RANGES.RAM.start] = value;
+    if (inRange(address, MEMORY_RANGES.RAM_FIXED)) {
+      this.ram[address - MEMORY_RANGES.RAM_FIXED.start] = value;
       return;
     }
 
-    if (inRange(address, MEMORY_RANGES.ECHO_RAM)) {
-      this.ram[address - MEMORY_RANGES.ECHO_RAM.start] = value;
+    if (inRange(address, MEMORY_RANGES.RAM_SWITCHABLE)) {
+      const bank = this.ramBank & 0x07 || 1;
+      this.ram[
+        bank * RAM_BANK_SIZE + (address - MEMORY_RANGES.RAM_SWITCHABLE.start)
+      ] = value;
+      return;
+    }
+
+    if (inRange(address, MEMORY_RANGES.ECHO_RAM_FIXED)) {
+      this.ram[address - MEMORY_RANGES.ECHO_RAM_FIXED.start] = value;
+      return;
+    }
+
+    if (inRange(address, MEMORY_RANGES.ECHO_RAM_SWITCHABLE)) {
+      const bank = this.ramBank & 0x07 || 1;
+      this.ram[
+        bank * RAM_BANK_SIZE +
+          (address - MEMORY_RANGES.ECHO_RAM_SWITCHABLE.start)
+      ] = value;
       return;
     }
 
@@ -162,6 +202,11 @@ export default class MMU {
 
       if (inRange(address, MEMORY_RANGES.LCD) && this.ppu) {
         return this.ppu.write(address, value);
+      }
+
+      if (address === MEMORY_RANGES.SVBK.start) {
+        this.ramBank = value;
+        return;
       }
 
       if (address === MEMORY_RANGES.IF.start) {
