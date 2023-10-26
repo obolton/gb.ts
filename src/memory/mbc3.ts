@@ -18,6 +18,7 @@ export default class MBC3 implements IO {
   ram: Uint8Array;
 
   romBanks: number;
+  ramBanks: number;
   romBank = 1;
   ramBank = 0;
   ramEnabled = false;
@@ -31,12 +32,15 @@ export default class MBC3 implements IO {
     switch (ramSize) {
       case 0:
         this.ram = new Uint8Array(0);
+        this.ramBanks = 0;
         break;
       case 2:
         this.ram = new Uint8Array(8192);
+        this.ramBanks = 1;
         break;
       case 3:
         this.ram = new Uint8Array(32768);
+        this.ramBanks = 4;
         break;
       default:
         throw new Error(`Unsupported external RAM size: ${ramSize}`);
@@ -71,12 +75,12 @@ export default class MBC3 implements IO {
     }
 
     if (inRange(address, MBC3_RANGES.ROM_BANK)) {
-      this.romBank = value === 0 ? 1 : value & 0x7f;
+      this.romBank = value === 0 ? 1 : value & (this.romBanks - 1);
       return;
     }
 
     if (inRange(address, MBC3_RANGES.RAM_BANK)) {
-      if (value <= 0x03) {
+      if (value <= 0x03 && this.ramBanks > 1) {
         this.ramBank = value;
       }
       return;

@@ -21,6 +21,7 @@ export default class MBC1 implements IO {
   ram: Uint8Array;
 
   romBanks: number;
+  ramBanks: number;
   romBank = 1;
   ramBank = 0;
   mode = Mode.ROM;
@@ -35,12 +36,15 @@ export default class MBC1 implements IO {
     switch (ramSize) {
       case 0:
         this.ram = new Uint8Array(0);
+        this.ramBanks = 0;
         break;
       case 2:
         this.ram = new Uint8Array(8192);
+        this.ramBanks = 1;
         break;
       case 3:
         this.ram = new Uint8Array(32768);
+        this.ramBanks = 4;
         break;
       default:
         throw new Error(`Unsupported external RAM size: ${ramSize}`);
@@ -49,7 +53,11 @@ export default class MBC1 implements IO {
 
   read(address: number) {
     if (inRange(address, MEMORY_RANGES.ROM_FIXED_BANK)) {
-      return this.rom[address];
+      if (this.mode === Mode.ROM) {
+        return this.rom[address];
+      } else {
+        return this.rom[(this.romBank & 0x60) * 0x4000 + address];
+      }
     }
 
     if (inRange(address, MEMORY_RANGES.ROM_SWITCHABLE_BANK)) {
@@ -60,13 +68,8 @@ export default class MBC1 implements IO {
     }
 
     if (inRange(address, MEMORY_RANGES.EXTRAM) && this.ramEnabled) {
-      if (this.mode === Mode.ROM) {
-        return this.ram[address - MEMORY_RANGES.EXTRAM.start];
-      } else {
-        return this.ram[
-          this.ramBank * 0x2000 + (address - MEMORY_RANGES.EXTRAM.start)
-        ];
-      }
+      const bank = this.mode === Mode.RAM ? this.ramBank : 0;
+      return this.ram[bank * 0x2000 + (address - MEMORY_RANGES.EXTRAM.start)];
     }
 
     return 0xff;
@@ -84,14 +87,14 @@ export default class MBC1 implements IO {
         bank = 1;
       }
 
-      this.romBank = (this.romBank & 0x60) | bank;
+      this.romBank = (this.romBank & 0x60) | (bank & (this.romBanks - 1));
       return;
     }
 
     if (inRange(address, MBC1_RANGES.RAM_BANK)) {
-      if (this.mode === Mode.ROM) {
+      if (this.mode === Mode.ROM && this.romBanks >= 32) {
         this.romBank = ((value & 0x03) << 5) | (this.romBank & 0x1f);
-      } else {
+      } else if (this.ramBanks > 1) {
         this.ramBank = value & 0x03;
       }
       return;
@@ -103,8 +106,8 @@ export default class MBC1 implements IO {
     }
 
     if (inRange(address, MEMORY_RANGES.EXTRAM) && this.ramEnabled) {
-      this.ram[this.ramBank * 0x2000 + (address - MEMORY_RANGES.EXTRAM.start)] =
-        value;
+      const bank = this.mode === Mode.RAM ? this.ramBank : 0;
+      this.ram[bank * 0x2000 + (address - MEMORY_RANGES.EXTRAM.start)] = value;
       return;
     }
   }

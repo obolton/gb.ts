@@ -19,13 +19,16 @@ export default class MBC5 implements IO {
   rom: Uint8Array;
   ram: Uint8Array;
 
+  romBanks: number;
   romBank = 1;
   ramBank = 0;
   ramEnabled = false;
 
   constructor(rom: Uint8Array) {
     this.rom = rom;
+    const romSize = rom[MEMORY_REGISTERS.ROM_SIZE];
     const ramSize = rom[MEMORY_REGISTERS.RAM_SIZE];
+    this.romBanks = 0x02 << romSize;
 
     switch (ramSize) {
       case 0:
@@ -73,7 +76,7 @@ export default class MBC5 implements IO {
     }
 
     if (inRange(address, MBC5_RANGES.ROM_BANK_LOW)) {
-      this.romBank = (this.romBank & 0x0100) | value;
+      this.romBank = (this.romBank & 0x0100) | (value & (this.romBanks - 1));
       return;
     }
 

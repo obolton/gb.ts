@@ -1,4 +1,4 @@
-import { MEMORY_RANGES } from './constants';
+import { MEMORY_RANGES, MEMORY_REGISTERS } from './constants';
 import { inRange } from '../utils';
 import { IO } from '../types';
 
@@ -6,11 +6,14 @@ export default class MBC2 implements IO {
   rom: Uint8Array;
   ram: Uint8Array;
 
+  romBanks: number;
   romBank = 1;
   ramEnabled = false;
 
   constructor(rom: Uint8Array) {
     this.rom = rom;
+    const romSize = rom[MEMORY_REGISTERS.ROM_SIZE];
+    this.romBanks = 0x02 << romSize;
     this.ram = new Uint8Array(512);
   }
 
@@ -40,7 +43,7 @@ export default class MBC2 implements IO {
         if (bank === 0) {
           bank = 1;
         }
-        this.romBank = bank;
+        this.romBank = bank & (this.romBanks - 1);
       } else {
         this.ramEnabled = value === 0x0a;
       }
