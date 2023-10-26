@@ -22,7 +22,8 @@ type MemoryType =
   | 'INPUT'
   | 'TIMER'
   | 'AUDIO'
-  | 'LCD';
+  | 'LCD'
+  | 'SPEED';
 
 export const MEMORY_RANGES: Record<MemoryType, AddressRange> = {
   ROM: { start: 0x0000, end: 0x7fff },
@@ -41,4 +42,5 @@ export const MEMORY_RANGES: Record<MemoryType, AddressRange> = {
   TIMER: { start: 0xff04, end: 0xff07 },
   AUDIO: { start: 0xff10, end: 0xff3f },
   LCD: { start: 0xff40, end: 0xff4b },
+  SPEED: { start: 0xff4d, end: 0xff4d },
 };

@@ -16,6 +16,7 @@ export default class MMU {
   hram: Uint8Array;
   ie: number;
   if: number;
+  speed: number;
 
   constructor() {
     this.ram = new Uint8Array(8192);
@@ -23,6 +24,7 @@ export default class MMU {
     this.hram = new Uint8Array(126);
     this.ie = 0x00;
     this.if = 0x00;
+    this.speed = 0;
   }
 
   reset() {
@@ -31,6 +33,7 @@ export default class MMU {
     this.hram = new Uint8Array(126);
     this.ie = 0x00;
     this.if = 0x00;
+    this.speed = 0;
   }
 
   read(address: number) {
@@ -63,6 +66,10 @@ export default class MMU {
     }
 
     if (inRange(address, MEMORY_RANGES.IO)) {
+      if (address === MEMORY_RANGES.SPEED.start) {
+        return this.speed;
+      }
+
       if (inRange(address, MEMORY_RANGES.INPUT) && this.input) {
         return this.input.read(address);
       }
@@ -136,6 +143,11 @@ export default class MMU {
     }
 
     if (inRange(address, MEMORY_RANGES.IO)) {
+      if (address === MEMORY_RANGES.SPEED.start) {
+        this.speed = value;
+        return;
+      }
+
       if (inRange(address, MEMORY_RANGES.INPUT) && this.input) {
         return this.input.write(address, value);
       }
