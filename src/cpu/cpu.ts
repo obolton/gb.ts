@@ -45,7 +45,8 @@ export default class CPU {
       this.ticks = 0;
 
       if (!this.registers.stop && !this.registers.halt) {
-        const operation = this.mmu.read(this.registers.pc++);
+        const operation = this.mmu.read(this.registers.pc);
+        this.registers.pc = (this.registers.pc + 1) & 0xffff;
         this.execute(operation);
       } else {
         this.ticks += 1;
@@ -656,7 +657,8 @@ export default class CPU {
   }
 
   prefixed() {
-    const operation = this.mmu.read(this.registers.pc++);
+    const operation = this.mmu.read(this.registers.pc);
+    this.registers.pc = (this.registers.pc + 1) & 0xffff;
     this.ticks += 1;
     this.executePrefixed(operation);
   }
@@ -690,12 +692,14 @@ export default class CPU {
   }
 
   fetchImmediate() {
-    return this.mmu.read(this.registers.pc++);
+    const value = this.mmu.read(this.registers.pc);
+    this.registers.pc = (this.registers.pc + 1) & 0xffff;
+    return value;
   }
 
   fetchImmediateWord() {
     const value = this.mmu.readWord(this.registers.pc);
-    this.registers.pc += 2;
+    this.registers.pc = (this.registers.pc + 2) & 0xffff;
     return value;
   }
 
@@ -996,7 +1000,7 @@ export default class CPU {
   call(condition: boolean) {
     const address = this.fetchImmediateWord();
     if (condition) {
-      this.registers.sp -= 2;
+      this.registers.sp = (this.registers.sp - 2) & 0xffff;
       this.mmu.writeWord(this.registers.sp, this.registers.pc);
       this.registers.pc = address;
       this.ticks += 6;
@@ -1029,7 +1033,7 @@ export default class CPU {
   }
 
   rst(address: number) {
-    this.registers.sp -= 2;
+    this.registers.sp = (this.registers.sp - 2) & 0xffff;
     this.mmu.writeWord(this.registers.sp, this.registers.pc);
     this.registers.pc = address;
     this.ticks += 4;
@@ -1061,14 +1065,14 @@ export default class CPU {
   // Stack
 
   push(register: Register16Bit) {
-    this.registers.sp -= 2;
+    this.registers.sp = (this.registers.sp - 2) & 0xffff;
     this.mmu.writeWord(this.registers.sp, this.registers[register]);
     this.ticks += 4;
   }
 
   pop(register: Register16Bit) {
     this.registers[register] = this.mmu.readWord(this.registers.sp);
-    this.registers.sp += 2;
+    this.registers.sp = (this.registers.sp + 2) & 0xffff;
     this.ticks += 3;
   }
 
