@@ -92,6 +92,7 @@ export default class APU {
       case AUDIO_REGISTERS.NR52:
         return (
           (this.enabled ? 0x80 : 0) |
+          0x70 |
           (this.channel4.enabled ? 0x08 : 0) |
           (this.channel3.enabled ? 0x04 : 0) |
           (this.channel2.enabled ? 0x02 : 0) |
@@ -101,6 +102,7 @@ export default class APU {
       // Channel 1
       case AUDIO_REGISTERS.NR10:
         return (
+          0x80 |
           (this.channel1.initialPeriodSweepPace << 4) |
           (this.channel1.periodSweepMode === SweepMode.DECREASE ? 0x08 : 0) |
           this.channel1.periodSweepSlope
@@ -139,10 +141,10 @@ export default class APU {
 
       // Channel 3
       case AUDIO_REGISTERS.NR30:
-        return this.channel3.dacEnabled ? 0x80 : 0;
+        return this.channel3.dacEnabled ? 0xff : 0x7f;
 
       case AUDIO_REGISTERS.NR32:
-        return this.channel3.outputLevel << 5;
+        return (this.channel3.outputLevel << 5) | 0x9f;
 
       case AUDIO_REGISTERS.NR34:
         return this.channel3.enableLengthTimer ? 0x40 : 0;
@@ -165,7 +167,7 @@ export default class APU {
         );
 
       case AUDIO_REGISTERS.NR44:
-        return this.channel4.enableLengthTimer ? 0x40 : 0;
+        return this.channel4.enableLengthTimer ? 0x7f : 0x3f;
 
       default:
         return 0xff;

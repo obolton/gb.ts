@@ -39,7 +39,7 @@ describe('APU', () => {
       apu.write(AUDIO_REGISTERS.NR52, 0x89);
       expect(apu.enabled).toBe(true);
       expect(apu.masterGain.gain.value).toEqual(0.25);
-      expect(apu.read(AUDIO_REGISTERS.NR52)).toEqual(0x80);
+      expect(apu.read(AUDIO_REGISTERS.NR52)).toEqual(0xf0);
     });
   });
 
@@ -48,27 +48,27 @@ describe('APU', () => {
       test('sweep pace', () => {
         apu.write(AUDIO_REGISTERS.NR10, 0x20);
         expect(apu.channel1.initialPeriodSweepPace).toEqual(2);
-        expect(apu.read(AUDIO_REGISTERS.NR10)).toEqual(0x20);
+        expect(apu.read(AUDIO_REGISTERS.NR10)).toEqual(0xa0);
       });
 
       describe('sweep direction', () => {
         test('sets to increase', () => {
           apu.write(AUDIO_REGISTERS.NR10, 0x00);
           expect(apu.channel1.periodSweepMode).toEqual(SweepMode.INCREASE);
-          expect(apu.read(AUDIO_REGISTERS.NR10)).toEqual(0x00);
+          expect(apu.read(AUDIO_REGISTERS.NR10)).toEqual(0x80);
         });
 
         test('sets to decrease', () => {
           apu.write(AUDIO_REGISTERS.NR10, 0x08);
           expect(apu.channel1.periodSweepMode).toEqual(SweepMode.DECREASE);
-          expect(apu.read(AUDIO_REGISTERS.NR10)).toEqual(0x08);
+          expect(apu.read(AUDIO_REGISTERS.NR10)).toEqual(0x88);
         });
       });
 
       test('sweep slope', () => {
         apu.write(AUDIO_REGISTERS.NR10, 0x03);
         expect(apu.channel1.periodSweepSlope).toEqual(3);
-        expect(apu.read(AUDIO_REGISTERS.NR10)).toEqual(0x03);
+        expect(apu.read(AUDIO_REGISTERS.NR10)).toEqual(0x83);
       });
     });
 
@@ -254,13 +254,13 @@ describe('APU', () => {
       it('enables DAC', () => {
         apu.write(AUDIO_REGISTERS.NR30, 0x80);
         expect(apu.channel3.dacEnabled).toBe(true);
-        expect(apu.read(AUDIO_REGISTERS.NR30)).toEqual(0x80);
+        expect(apu.read(AUDIO_REGISTERS.NR30)).toEqual(0xff);
       });
 
       it('disables DAC', () => {
         apu.write(AUDIO_REGISTERS.NR30, 0x00);
         expect(apu.channel3.dacEnabled).toBe(false);
-        expect(apu.read(AUDIO_REGISTERS.NR30)).toEqual(0x00);
+        expect(apu.read(AUDIO_REGISTERS.NR30)).toEqual(0x7f);
       });
     });
 
@@ -274,25 +274,25 @@ describe('APU', () => {
       it('mutes', () => {
         apu.write(AUDIO_REGISTERS.NR32, 0x00);
         expect(apu.channel3.initialVolume).toEqual(0);
-        expect(apu.read(AUDIO_REGISTERS.NR32)).toEqual(0x00);
+        expect(apu.read(AUDIO_REGISTERS.NR32)).toEqual(0x9f);
       });
 
       it('sets output level to 100%', () => {
         apu.write(AUDIO_REGISTERS.NR32, 0x20);
         expect(apu.channel3.initialVolume).toEqual(7);
-        expect(apu.read(AUDIO_REGISTERS.NR32)).toEqual(0x20);
+        expect(apu.read(AUDIO_REGISTERS.NR32)).toEqual(0xbf);
       });
 
       it('sets output level to 50%', () => {
         apu.write(AUDIO_REGISTERS.NR32, 0x40);
         expect(apu.channel3.initialVolume).toEqual(3);
-        expect(apu.read(AUDIO_REGISTERS.NR32)).toEqual(0x40);
+        expect(apu.read(AUDIO_REGISTERS.NR32)).toEqual(0xdf);
       });
 
       it('sets output level to 25%', () => {
         apu.write(AUDIO_REGISTERS.NR32, 0x60);
         expect(apu.channel3.initialVolume).toEqual(1);
-        expect(apu.read(AUDIO_REGISTERS.NR32)).toEqual(0x60);
+        expect(apu.read(AUDIO_REGISTERS.NR32)).toEqual(0xff);
       });
     });
 
@@ -416,13 +416,13 @@ describe('APU', () => {
         test('enables length timer', () => {
           apu.write(AUDIO_REGISTERS.NR44, 0x40);
           expect(apu.channel4.enableLengthTimer).toBe(true);
-          expect(apu.read(AUDIO_REGISTERS.NR44)).toEqual(0x40);
+          expect(apu.read(AUDIO_REGISTERS.NR44)).toEqual(0x7f);
         });
 
         test('disables length timer', () => {
           apu.write(AUDIO_REGISTERS.NR44, 0x00);
           expect(apu.channel4.enableLengthTimer).toBe(false);
-          expect(apu.read(AUDIO_REGISTERS.NR44)).toEqual(0x00);
+          expect(apu.read(AUDIO_REGISTERS.NR44)).toEqual(0x3f);
         });
       });
 
