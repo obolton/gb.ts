@@ -49,7 +49,8 @@ export default class GameBoy {
       throw new Error('Already running');
     }
 
-    this.mmu.externalMemory = new ExternalMemory(rom);
+    this.externalMemory = new ExternalMemory(rom);
+    this.mmu.externalMemory = this.externalMemory;
     this.cpu.run();
     this.running = true;
   }
@@ -62,5 +63,9 @@ export default class GameBoy {
     this.ppu.reset();
     this.apu.reset();
     this.running = false;
+  }
+
+  getGameTitle() {
+    return this.externalMemory?.getGameTitle();
   }
 }

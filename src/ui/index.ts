@@ -75,6 +75,7 @@ const KEY_MAPPING: { [code: string]: Button } = {
     display.getContext('2d')?.clearRect(0, 0, display.width, display.height);
     device.classList.remove('on');
     powerButton.disabled = true;
+    document.title = 'gb.ts';
   });
 
   // Bind key events
@@ -107,6 +108,7 @@ const KEY_MAPPING: { [code: string]: Button } = {
     const rom = new Uint8Array(result);
     try {
       gameboy.start(rom);
+      document.title = `gb.ts - ${gameboy.getGameTitle()}`;
     } catch (error) {
       if (error instanceof Error) {
         window.alert(error.message);
