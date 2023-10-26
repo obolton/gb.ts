@@ -101,7 +101,7 @@ export default class MMU {
   }
 
   readWord(address: number) {
-    return (this.read(address + 1) << 8) | this.read(address);
+    return (this.read((address + 1) & 0xffff) << 8) | this.read(address);
   }
 
   write(address: number, value: number) {
@@ -176,7 +176,7 @@ export default class MMU {
 
   writeWord(address: number, value: number) {
     this.write(address, value & 0xff);
-    this.write(address + 1, value >> 8);
+    this.write((address + 1) & 0xffff, value >> 8);
   }
 
   dma(source: number) {
