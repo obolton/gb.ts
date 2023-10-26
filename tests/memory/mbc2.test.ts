@@ -60,8 +60,8 @@ describe('MBC2', () => {
     test('reads and writes to RAM when RAM is enabled', () => {
       const mbc = new MBC2(MOCK_ROM);
       mbc.write(0x0000, 0x0a);
-      mbc.write(0xa000, 0x0f);
-      expect(mbc.read(0xa000)).toEqual(0x0f);
+      mbc.write(0xa000, 0x02);
+      expect(mbc.read(0xa000)).toEqual(0xf2);
     });
 
     test('cannot read or write to RAM when RAM is disabled', () => {

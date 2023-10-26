@@ -30,7 +30,7 @@ export default class MBC2 implements IO {
     }
 
     if (inRange(address, MEMORY_RANGES.EXTRAM) && this.ramEnabled) {
-      return this.ram[address & 0x01ff];
+      return 0xf0 | this.ram[address & 0x01ff];
     }
 
     return 0xff;
