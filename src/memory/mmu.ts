@@ -83,7 +83,7 @@ export default class MMU {
       }
 
       if (address === MEMORY_RANGES.IF.start) {
-        return this.if;
+        return this.if | 0xe0;
       }
 
       return 0xff;
@@ -94,7 +94,7 @@ export default class MMU {
     }
 
     if (address === MEMORY_RANGES.IE.start) {
-      return this.ie;
+      return this.ie | 0xe0;
     }
 
     throw new Error(`Unknown address: ${address.toString(16)}`);
