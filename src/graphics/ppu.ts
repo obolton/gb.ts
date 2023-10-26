@@ -35,6 +35,7 @@ export default class PPU {
   objects: ObjectAttributes[] = [];
   backgroundPixels = new Array<number>(SCREEN_WIDTH);
   clock = 0;
+  dma = 0xff;
 
   backgroundWindowEnabled = false;
   objectsEnabled = false;
@@ -134,6 +135,8 @@ export default class PPU {
         return this.ly;
       case GRAPHICS_REGISTERS.LYC:
         return this.lyc;
+      case GRAPHICS_REGISTERS.DMA:
+        return this.dma;
       case GRAPHICS_REGISTERS.BGP:
         return (
           (this.backgroundPalette[3] << 6) |
@@ -192,6 +195,7 @@ export default class PPU {
         this.lyc = value;
         return;
       case GRAPHICS_REGISTERS.DMA:
+        this.dma = value;
         this.mmu?.dma(value);
         return;
       case GRAPHICS_REGISTERS.BGP:
