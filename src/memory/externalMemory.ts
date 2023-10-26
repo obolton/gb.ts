@@ -54,4 +54,8 @@ export default class ExternalMemory {
   write(address: number, value: number) {
     return this.mbc.write(address, value);
   }
+
+  getGameTitle() {
+    return String.fromCharCode(...this.rom.slice(0x0134, 0x0143));
+  }
 }
