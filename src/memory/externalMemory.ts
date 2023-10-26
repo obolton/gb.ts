@@ -58,4 +58,8 @@ export default class ExternalMemory {
   getGameTitle() {
     return String.fromCharCode(...this.rom.slice(0x0134, 0x0143));
   }
+
+  isCGBCompatible() {
+    return Boolean(this.rom[0x0143] & 0x80);
+  }
 }
