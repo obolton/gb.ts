@@ -1,6 +1,8 @@
 export const SCREEN_WIDTH = 160;
 export const SCREEN_HEIGHT = 144;
 
+export const VRAM_BANK_SIZE = 0x2000;
+
 export const COLOR_MAP = [0xff, 0xc0, 0x60, 0x00];
 
 export const GRAPHICS_REGISTERS = {
