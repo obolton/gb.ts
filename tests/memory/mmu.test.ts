@@ -20,12 +20,6 @@ describe('MMU', () => {
     expect(mmu.read(0x0001)).toEqual(MOCK_ROM[0x0001]);
   });
 
-  test('reads and writes to VRAM', () => {
-    mmu.write(0x8000, 0x0a);
-    expect(mmu.vram[0]).toEqual(0x0a);
-    expect(mmu.read(0x8000)).toEqual(0x0a);
-  });
-
   test('reads and writes to EXTRAM', () => {
     const spy = jest.spyOn(externalMemory, 'write');
     mmu.write(0xa000, 0x0a);

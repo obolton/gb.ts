@@ -21,6 +21,14 @@ describe('PPU', () => {
   mmu.ppu = ppu;
   ppu.mmu = mmu;
 
+  describe('VRAM', () => {
+    test('reads and writes to VRAM', () => {
+      mmu.write(0x8000, 0x0a);
+      expect(ppu.vram[0]).toEqual(0x0a);
+      expect(ppu.read(0x8000)).toEqual(0x0a);
+    });
+  });
+
   describe('registers', () => {
     describe('LCDC', () => {
       test('defaults flags to off', () => {

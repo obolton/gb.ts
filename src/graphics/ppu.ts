@@ -1,11 +1,14 @@
 import { Interrupts } from '../cpu/interrupts';
 import MMU from '../memory/mmu';
+import { MEMORY_RANGES } from '../memory/constants';
 import {
   COLOR_MAP,
   SCREEN_WIDTH,
   SCREEN_HEIGHT,
   GRAPHICS_REGISTERS,
+  VRAM_BANK_SIZE,
 } from './constants';
+import { inRange } from '../utils';
 
 export enum Mode {
   HORIZONTAL_BLANK,
@@ -31,6 +34,9 @@ export default class PPU {
 
   context: CanvasRenderingContext2D;
   imageData: ImageData;
+
+  vram: Uint8Array;
+  vramBank = 0;
 
   objects: ObjectAttributes[] = [];
   backgroundPixels = new Array<number>(SCREEN_WIDTH);
@@ -71,9 +77,14 @@ export default class PPU {
 
     this.context = context;
     this.imageData = context.createImageData(SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    this.vram = new Uint8Array(VRAM_BANK_SIZE * 2);
   }
 
   reset() {
+    this.vram = new Uint8Array(VRAM_BANK_SIZE * 2);
+    this.vramBank = 0;
+
     this.objects = [];
     this.backgroundPixels = new Array<number>(SCREEN_WIDTH);
     this.clock = 0;
@@ -106,6 +117,10 @@ export default class PPU {
   }
 
   read(address: number) {
+    if (inRange(address, MEMORY_RANGES.VRAM)) {
+      return this.vramRead(address - MEMORY_RANGES.VRAM.start);
+    }
+
     switch (address) {
       case GRAPHICS_REGISTERS.LCDC:
         return (
@@ -168,6 +183,11 @@ export default class PPU {
   }
 
   write(address: number, value: number) {
+    if (inRange(address, MEMORY_RANGES.VRAM)) {
+      this.vramWrite(address - MEMORY_RANGES.VRAM.start, value);
+      return;
+    }
+
     switch (address) {
       case GRAPHICS_REGISTERS.LCDC:
         this.enabled = Boolean(value & 0x80);
@@ -229,6 +249,20 @@ export default class PPU {
         this.wx = value;
         return;
     }
+  }
+
+  vramRead(address: number, bank = this.vramBank & 0x01) {
+    return this.vram[bank * VRAM_BANK_SIZE + address];
+  }
+
+  vramReadWord(address: number, bank = this.vramBank & 0x01) {
+    return (
+      (this.vramRead(address + 1, bank) << 8) | this.vramRead(address, bank)
+    );
+  }
+
+  vramWrite(address: number, value: number, bank = this.vramBank & 0x01) {
+    this.vram[bank * VRAM_BANK_SIZE + address] = value;
   }
 
   step(count: number) {

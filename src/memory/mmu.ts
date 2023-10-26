@@ -11,7 +11,6 @@ export default class MMU {
   input?: IO;
   externalMemory?: IO;
 
-  vram: Uint8Array;
   ram: Uint8Array;
   oam: Uint8Array;
   hram: Uint8Array;
@@ -19,7 +18,6 @@ export default class MMU {
   if: number;
 
   constructor() {
-    this.vram = new Uint8Array(8192);
     this.ram = new Uint8Array(8192);
     this.oam = new Uint8Array(160);
     this.hram = new Uint8Array(126);
@@ -28,7 +26,6 @@ export default class MMU {
   }
 
   reset() {
-    this.vram = new Uint8Array(8192);
     this.ram = new Uint8Array(8192);
     this.oam = new Uint8Array(160);
     this.hram = new Uint8Array(126);
@@ -45,8 +42,8 @@ export default class MMU {
       return this.externalMemory.read(address);
     }
 
-    if (inRange(address, MEMORY_RANGES.VRAM)) {
-      return this.vram[address - MEMORY_RANGES.VRAM.start];
+    if (inRange(address, MEMORY_RANGES.VRAM) && this.ppu) {
+      return this.ppu.read(address);
     }
 
     if (inRange(address, MEMORY_RANGES.EXTRAM)) {
@@ -113,8 +110,8 @@ export default class MMU {
       this.externalMemory.write(address, value);
     }
 
-    if (inRange(address, MEMORY_RANGES.VRAM)) {
-      this.vram[address - MEMORY_RANGES.VRAM.start] = value;
+    if (inRange(address, MEMORY_RANGES.VRAM) && this.ppu) {
+      this.ppu.write(address, value);
       return;
     }
 
