@@ -27,6 +27,8 @@ export default class ExternalMemory {
       case 0x06:
         this.mbc = new MBC2(rom);
         break;
+      case 0x0f:
+      case 0x10:
       case 0x11:
       case 0x12:
       case 0x13:
