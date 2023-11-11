@@ -326,13 +326,22 @@ export default class PPU {
         this.wx = value;
         return;
       case GRAPHICS_REGISTERS.VBK:
+        if (!this.cgbMode) {
+          return;
+        }
         this.vramBank = value;
         return;
       case GRAPHICS_REGISTERS.BCPS:
+        if (!this.cgbMode) {
+          return;
+        }
         this.backgroundPaletteIndex = value & 0x3f;
         this.incrementBackgroundPaletteIndex = Boolean(value & 0x80);
         return;
       case GRAPHICS_REGISTERS.BCPD:
+        if (!this.cgbMode) {
+          return;
+        }
         this.colorBackgroundPalette[this.backgroundPaletteIndex] = value;
         if (this.incrementBackgroundPaletteIndex) {
           this.backgroundPaletteIndex =
@@ -340,29 +349,50 @@ export default class PPU {
         }
         return;
       case GRAPHICS_REGISTERS.OCPS:
+        if (!this.cgbMode) {
+          return;
+        }
         this.objectPaletteIndex = value & 0x3f;
         this.incrementObjectPaletteIndex = Boolean(value & 0x80);
         return;
       case GRAPHICS_REGISTERS.OCPD:
+        if (!this.cgbMode) {
+          return;
+        }
         this.colorObjectPalette[this.objectPaletteIndex] = value;
         if (this.incrementObjectPaletteIndex) {
           this.objectPaletteIndex = (this.objectPaletteIndex + 1) & 0x3f;
         }
         return;
       case GRAPHICS_REGISTERS.HDMA1:
+        if (!this.cgbMode) {
+          return;
+        }
         this.vramDmaSource = (value << 8) | (this.vramDmaSource & 0x00ff);
         return;
       case GRAPHICS_REGISTERS.HDMA2:
+        if (!this.cgbMode) {
+          return;
+        }
         this.vramDmaSource = (this.vramDmaSource & 0xff00) | value;
         return;
       case GRAPHICS_REGISTERS.HDMA3:
+        if (!this.cgbMode) {
+          return;
+        }
         this.vramDmaDestination =
           (value << 8) | (this.vramDmaDestination & 0x00ff);
         return;
       case GRAPHICS_REGISTERS.HDMA4:
+        if (!this.cgbMode) {
+          return;
+        }
         this.vramDmaDestination = (this.vramDmaDestination & 0xff00) | value;
         return;
       case GRAPHICS_REGISTERS.HDMA5:
+        if (!this.cgbMode) {
+          return;
+        }
         this.vramDma((value & 0x80) >> 7, value & 0x7f);
         return;
     }
