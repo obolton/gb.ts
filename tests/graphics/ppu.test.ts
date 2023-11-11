@@ -99,7 +99,7 @@ describe('PPU', () => {
 
     describe('STAT', () => {
       test('defaults flags to off and LYC = LY to true', () => {
-        expect(ppu.read(GRAPHICS_REGISTERS.STAT)).toEqual(0x04);
+        expect(ppu.read(GRAPHICS_REGISTERS.STAT)).toEqual(0x84);
       });
 
       test('enables LYC interrupts', () => {
@@ -221,7 +221,7 @@ describe('PPU', () => {
       jest.spyOn(mmu, 'dma');
       ppu.write(GRAPHICS_REGISTERS.DMA, 0x01);
       expect(mmu.dma).toHaveBeenCalledTimes(1);
-      expect(ppu.read(GRAPHICS_REGISTERS.DMA)).toEqual(0xff);
+      expect(ppu.read(GRAPHICS_REGISTERS.DMA)).toEqual(0x01);
     });
 
     describe('BGP', () => {

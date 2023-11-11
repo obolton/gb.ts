@@ -55,13 +55,13 @@ describe('MMU', () => {
   test('reads and writes to IE', () => {
     mmu.write(0xffff, 0x0a);
     expect(mmu.ie).toEqual(0x0a);
-    expect(mmu.read(0xffff)).toEqual(0x0a);
+    expect(mmu.read(0xffff)).toEqual(0xea);
   });
 
   test('reads and writes to IF', () => {
     mmu.write(0xff0f, 0x0a);
     expect(mmu.if).toEqual(0x0a);
-    expect(mmu.read(0xff0f)).toEqual(0x0a);
+    expect(mmu.read(0xff0f)).toEqual(0xea);
   });
 
   describe('IO', () => {

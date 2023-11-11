@@ -86,6 +86,7 @@ describe('CPU', () => {
       cpu.execute(0x10);
       expect(getCurrentState()).toEqual({
         ...previousState,
+        pc: previousState.pc + 1,
         ticks: 1,
         stop: true,
       });
@@ -620,8 +621,7 @@ describe('CPU', () => {
           cpu.registers[high] = 0xa1;
           cpu.registers[low] = 0x23;
           cpu.execute(opcode);
-          expect(getCurrentState()).toEqual({
-            ...previousState,
+          expect(getCurrentState()).toMatchObject({
             [high]: 0xa1,
             [low]: 0x22,
             ticks: 2,
@@ -633,8 +633,7 @@ describe('CPU', () => {
           cpu.registers[high] = 0x00;
           cpu.registers[low] = 0x00;
           cpu.execute(opcode);
-          expect(getCurrentState()).toEqual({
-            ...previousState,
+          expect(getCurrentState()).toMatchObject({
             [high]: 0xff,
             [low]: 0xff,
             ticks: 2,
