@@ -48,7 +48,7 @@ export const MEMORY_RANGES: Record<MemoryType, AddressRange> = {
   INPUT: { start: 0xff00, end: 0xff00 },
   TIMER: { start: 0xff04, end: 0xff07 },
   AUDIO: { start: 0xff10, end: 0xff3f },
-  LCD: { start: 0xff40, end: 0xff4b },
+  LCD: { start: 0xff40, end: 0xff6c },
   SVBK: { start: 0xff70, end: 0xff70 },
   SPEED: { start: 0xff4d, end: 0xff4d },
 };
