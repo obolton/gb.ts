@@ -84,12 +84,12 @@ export default class PPU {
 
   // Color
   colorBackgroundPalette = new Uint8Array(64).fill(255);
-  backgroundPaletteIndex = 0;
-  incrementBackgroundPaletteIndex = false;
+  backgroundPaletteIndex = 0x3f;
+  incrementBackgroundPaletteIndex = true;
 
   colorObjectPalette = new Uint8Array(64).fill(255);
-  objectPaletteIndex = 0;
-  incrementObjectPaletteIndex = false;
+  objectPaletteIndex = 0x3f;
+  incrementObjectPaletteIndex = true;
 
   vramDmaSource = 0x0000;
   vramDmaDestination = 0x0000;
@@ -144,12 +144,12 @@ export default class PPU {
     this.objectPalette1 = [0, 0, 0, 0];
 
     this.colorBackgroundPalette = new Uint8Array(64).fill(255);
-    this.backgroundPaletteIndex = 0;
-    this.incrementBackgroundPaletteIndex = false;
+    this.backgroundPaletteIndex = 0x3f;
+    this.incrementBackgroundPaletteIndex = true;
 
     this.colorObjectPalette = new Uint8Array(64).fill(255);
-    this.objectPaletteIndex = 0;
-    this.incrementObjectPaletteIndex = false;
+    this.objectPaletteIndex = 0x3f;
+    this.incrementObjectPaletteIndex = true;
 
     this.vramDmaSource = 0x0000;
     this.vramDmaDestination = 0x0000;
