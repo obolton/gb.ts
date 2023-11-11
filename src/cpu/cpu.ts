@@ -17,6 +17,7 @@ export default class CPU {
   timer?: Timer;
   ticks = 0;
   frameInterval: number | null;
+  doubleSpeed = false;
 
   constructor(mmu: MMU) {
     this.mmu = mmu;
@@ -27,15 +28,17 @@ export default class CPU {
   reset() {
     this.registers.reset();
     this.ticks = 0;
-    if (this.frameInterval) {
-      clearInterval(this.frameInterval);
-      this.frameInterval = null;
-    }
+    this.doubleSpeed = false;
+    clearInterval(this.frameInterval ?? 0);
+    this.frameInterval = null;
   }
 
   run() {
     if (!this.frameInterval) {
-      this.frameInterval = window.setInterval(this.runFrame.bind(this), 16);
+      this.frameInterval = window.setInterval(
+        this.runFrame.bind(this),
+        this.doubleSpeed ? 16 : 8
+      );
     }
   }
 
@@ -709,7 +712,21 @@ export default class CPU {
   }
 
   stop() {
-    this.registers.stop = true;
+    this.registers.pc = (this.registers.pc + 1) & 0xffff;
+
+    // Speed switch
+    if (this.mmu.speed & 0x01) {
+      this.doubleSpeed = !this.doubleSpeed;
+      this.mmu.speed = this.doubleSpeed ? 0x80 : 0;
+      const interval = this.doubleSpeed ? 16 : 8;
+      clearInterval(this.frameInterval || 0);
+      this.frameInterval = window.setInterval(
+        this.runFrame.bind(this),
+        interval
+      );
+    } else {
+      this.registers.stop = true;
+    }
     this.ticks += 1;
   }
 
