@@ -34,7 +34,7 @@ type RegisterInterface = {
 export default class Registers implements RegisterInterface {
   private mmu: MMU;
 
-  a = 0x01;
+  a = 0x11;
   b = 0x00;
   c = 0x13;
   d = 0x00;
@@ -53,7 +53,7 @@ export default class Registers implements RegisterInterface {
   }
 
   reset() {
-    this.a = 0x01;
+    this.a = 0x11;
     this.b = 0x00;
     this.c = 0x13;
     this.d = 0x00;
