@@ -37,7 +37,7 @@ export default class CPU {
     if (!this.frameInterval) {
       this.frameInterval = window.setInterval(
         this.runFrame.bind(this),
-        this.doubleSpeed ? 16 : 8
+        this.doubleSpeed ? 8 : 16
       );
     }
   }
@@ -718,7 +718,7 @@ export default class CPU {
     if (this.mmu.speed & 0x01) {
       this.doubleSpeed = !this.doubleSpeed;
       this.mmu.speed = this.doubleSpeed ? 0x80 : 0;
-      const interval = this.doubleSpeed ? 16 : 8;
+      const interval = this.doubleSpeed ? 8 : 16;
       clearInterval(this.frameInterval || 0);
       this.frameInterval = window.setInterval(
         this.runFrame.bind(this),
