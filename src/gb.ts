@@ -16,6 +16,7 @@ export default class GameBoy {
   input: Input;
   externalMemory?: ExternalMemory;
   running = false;
+  cgbMode = false;
 
   constructor(display: HTMLCanvasElement) {
     this.display = display;
@@ -51,6 +52,9 @@ export default class GameBoy {
 
     this.externalMemory = new ExternalMemory(rom);
     this.mmu.externalMemory = this.externalMemory;
+
+    this.cgbMode = this.externalMemory.isCGBCompatible();
+    this.ppu.cgbMode = this.cgbMode;
     this.cpu.run();
     this.running = true;
   }
