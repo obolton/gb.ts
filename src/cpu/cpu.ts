@@ -688,6 +688,7 @@ export default class CPU {
   }
 
   invalid(opcode: number) {
+    this.registers.stop = true;
     throw new Error(`Invalid opcode: ${opcode.toString(16)}`);
   }
 
