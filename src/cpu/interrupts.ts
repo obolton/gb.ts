@@ -1,9 +1,11 @@
+type InterruptNames = 'VBLANK' | 'LCD_STAT' | 'TIMER' | 'SERIAL' | 'JOYPAD';
+
 export type Interrupt = {
   flag: number;
   handlerAddress: number;
 };
 
-export const Interrupts: { [key: string]: Interrupt } = {
+export const Interrupts: { [key in InterruptNames]: Interrupt } = {
   VBLANK: {
     flag: 0x01,
     handlerAddress: 0x40,
