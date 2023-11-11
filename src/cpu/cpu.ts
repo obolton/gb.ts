@@ -55,10 +55,10 @@ export default class CPU {
         this.ticks += 1;
       }
 
+      this.checkInterrupts();
+
       this.ppu?.step(this.ticks);
       this.timer?.step(this.ticks);
-
-      this.checkInterrupts();
 
       frameTicks += this.ticks;
     }
