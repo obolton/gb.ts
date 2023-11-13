@@ -240,6 +240,6 @@ export default class MMU {
   }
 
   requestInterrupt(interrupt: Interrupt) {
-    this.write(0xff0f, this.read(0xff0f) | interrupt.flag);
+    this.if |= interrupt.flag;
   }
 }

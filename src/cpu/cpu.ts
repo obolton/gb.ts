@@ -667,8 +667,8 @@ export default class CPU {
   }
 
   checkInterrupts() {
-    const enabledFlags = this.mmu.read(0xffff);
-    const firedFlags = this.mmu.read(0xff0f);
+    const enabledFlags = this.mmu.read(0xffff) & 0x1f;
+    const firedFlags = this.mmu.read(0xff0f) & 0x1f;
     const interrupts = enabledFlags & firedFlags;
 
     // Resume from HALT
