@@ -2,24 +2,26 @@
   "name": "gb.ts",
   "version": "1.0.0",
   "description": "A web-based Game Boy emulator written in TypeScript",
-  "author": "Oliver Bolton",
   "license": "MIT",
+  "author": "Oliver Bolton",
   "main": "src/gb.ts",
-  "packageManager": "pnpm@11.5.1",
   "scripts": {
     "build": "esbuild src/ui/index.ts --bundle --outdir=public --minify",
     "start": "esbuild src/ui/index.ts --bundle --sourcemap --watch --outdir=public --servedir=public",
     "test": "vitest run --coverage",
     "test:watch": "vitest",
-    "lint": "oxlint"
+    "lint": "oxlint",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^4.1.7",
     "esbuild": "0.28.0",
     "jsdom": "^29.1.1",
+    "oxfmt": "^0.53.0",
     "oxlint": "^1.68.0",
-    "prettier": "3.0.3",
     "typescript": "^6.0.3",
     "vitest": "^4.1.7"
-  }
+  },
+  "packageManager": "pnpm@11.5.1"
 }
