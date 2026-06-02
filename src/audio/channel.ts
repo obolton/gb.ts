@@ -64,9 +64,7 @@ export default class Channel {
   updateGain() {
     const volume = this.volume / 0xf;
     this.gainNode.gain.value =
-      this.enabled && this.dacEnabled && (this.mixLeft || this.mixRight)
-        ? volume
-        : 0;
+      this.enabled && this.dacEnabled && (this.mixLeft || this.mixRight) ? volume : 0;
 
     // Center
     if (this.mixLeft && this.mixRight) {
@@ -123,10 +121,7 @@ export default class Channel {
     if (this.envelopePaceCount >= this.envelopeSweepPace) {
       if (this.envelopeSweepMode === SweepMode.INCREASE && this.volume < 0xf) {
         this.volume++;
-      } else if (
-        this.envelopeSweepMode === SweepMode.DECREASE &&
-        this.volume > 0
-      ) {
+      } else if (this.envelopeSweepMode === SweepMode.DECREASE && this.volume > 0) {
         this.volume--;
       }
 

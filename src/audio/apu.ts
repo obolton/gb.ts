@@ -114,9 +114,7 @@ export default class APU {
       case AUDIO_REGISTERS.NR12:
         return (
           (this.channel1.initialVolume << 4) |
-          (this.channel1.initialEnvelopeSweepMode === SweepMode.INCREASE
-            ? 0x08
-            : 0) |
+          (this.channel1.initialEnvelopeSweepMode === SweepMode.INCREASE ? 0x08 : 0) |
           this.channel1.initialEnvelopeSweepPace
         );
 
@@ -130,9 +128,7 @@ export default class APU {
       case AUDIO_REGISTERS.NR22:
         return (
           (this.channel2.initialVolume << 4) |
-          (this.channel2.initialEnvelopeSweepMode === SweepMode.INCREASE
-            ? 0x08
-            : 0) |
+          (this.channel2.initialEnvelopeSweepMode === SweepMode.INCREASE ? 0x08 : 0) |
           this.channel2.initialEnvelopeSweepPace
         );
 
@@ -153,9 +149,7 @@ export default class APU {
       case AUDIO_REGISTERS.NR42:
         return (
           (this.channel4.initialVolume << 4) |
-          (this.channel4.initialEnvelopeSweepMode === SweepMode.INCREASE
-            ? 0x08
-            : 0) |
+          (this.channel4.initialEnvelopeSweepMode === SweepMode.INCREASE ? 0x08 : 0) |
           this.channel4.initialEnvelopeSweepPace
         );
 
@@ -206,8 +200,7 @@ export default class APU {
       // Channel 1
       case AUDIO_REGISTERS.NR10:
         this.channel1.initialPeriodSweepPace = (value & 0x70) >> 4;
-        this.channel1.periodSweepMode =
-          value & 0x08 ? SweepMode.DECREASE : SweepMode.INCREASE;
+        this.channel1.periodSweepMode = value & 0x08 ? SweepMode.DECREASE : SweepMode.INCREASE;
         this.channel1.periodSweepSlope = value & 0x07;
         return;
 
@@ -230,8 +223,7 @@ export default class APU {
 
       case AUDIO_REGISTERS.NR14:
         this.channel1.enableLengthTimer = Boolean(value & 0x40);
-        this.channel1.period =
-          ((value & 0x07) << 8) | (this.channel1.period & 0x00ff);
+        this.channel1.period = ((value & 0x07) << 8) | (this.channel1.period & 0x00ff);
 
         if (value & 0x80) {
           this.channel1.trigger();
@@ -258,8 +250,7 @@ export default class APU {
 
       case AUDIO_REGISTERS.NR24:
         this.channel2.enableLengthTimer = Boolean(value & 0x40);
-        this.channel2.period =
-          ((value & 0x07) << 8) | (this.channel2.period & 0x00ff);
+        this.channel2.period = ((value & 0x07) << 8) | (this.channel2.period & 0x00ff);
 
         if (value & 0x80) {
           this.channel2.trigger();
@@ -280,14 +271,12 @@ export default class APU {
         return;
 
       case AUDIO_REGISTERS.NR33:
-        this.channel3.periodValue =
-          (this.channel3.periodValue & 0xff00) | value;
+        this.channel3.periodValue = (this.channel3.periodValue & 0xff00) | value;
         return;
 
       case AUDIO_REGISTERS.NR34:
         this.channel3.enableLengthTimer = Boolean(value & 0x40);
-        this.channel3.periodValue =
-          ((value & 0x07) << 8) | (this.channel3.periodValue & 0x00ff);
+        this.channel3.periodValue = ((value & 0x07) << 8) | (this.channel3.periodValue & 0x00ff);
 
         if (value & 0x80) {
           this.channel3.trigger();

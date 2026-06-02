@@ -26,13 +26,9 @@ const KEY_MAPPING: { [code: string]: Button } = {
 
 (function init() {
   const display = document.getElementById('display') as HTMLCanvasElement;
-  const fileInput = document.getElementById(
-    'romSelectorInput'
-  ) as HTMLInputElement;
+  const fileInput = document.getElementById('romSelectorInput') as HTMLInputElement;
   const device = document.getElementById('device') as HTMLDivElement;
-  const powerButton = document.getElementById(
-    'powerButton'
-  ) as HTMLButtonElement;
+  const powerButton = document.getElementById('powerButton') as HTMLButtonElement;
   const controls = document.getElementById('controls') as HTMLDivElement;
 
   const gameboy = new GameBoy(display);

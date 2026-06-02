@@ -62,9 +62,7 @@ export default class MMU {
 
     if (inRange(address, MEMORY_RANGES.RAM_SWITCHABLE)) {
       const bank = this.ramBank & 0x07 || 1;
-      return this.ram[
-        bank * RAM_BANK_SIZE + (address - MEMORY_RANGES.RAM_SWITCHABLE.start)
-      ];
+      return this.ram[bank * RAM_BANK_SIZE + (address - MEMORY_RANGES.RAM_SWITCHABLE.start)];
     }
 
     if (inRange(address, MEMORY_RANGES.ECHO_RAM_FIXED)) {
@@ -73,10 +71,7 @@ export default class MMU {
 
     if (inRange(address, MEMORY_RANGES.ECHO_RAM_SWITCHABLE)) {
       const bank = this.ramBank & 0x07 || 1;
-      return this.ram[
-        bank * RAM_BANK_SIZE +
-          (address - MEMORY_RANGES.ECHO_RAM_SWITCHABLE.start)
-      ];
+      return this.ram[bank * RAM_BANK_SIZE + (address - MEMORY_RANGES.ECHO_RAM_SWITCHABLE.start)];
     }
 
     if (inRange(address, MEMORY_RANGES.OAM)) {
@@ -157,9 +152,7 @@ export default class MMU {
 
     if (inRange(address, MEMORY_RANGES.RAM_SWITCHABLE)) {
       const bank = this.ramBank & 0x07 || 1;
-      this.ram[
-        bank * RAM_BANK_SIZE + (address - MEMORY_RANGES.RAM_SWITCHABLE.start)
-      ] = value;
+      this.ram[bank * RAM_BANK_SIZE + (address - MEMORY_RANGES.RAM_SWITCHABLE.start)] = value;
       return;
     }
 
@@ -170,10 +163,7 @@ export default class MMU {
 
     if (inRange(address, MEMORY_RANGES.ECHO_RAM_SWITCHABLE)) {
       const bank = this.ramBank & 0x07 || 1;
-      this.ram[
-        bank * RAM_BANK_SIZE +
-          (address - MEMORY_RANGES.ECHO_RAM_SWITCHABLE.start)
-      ] = value;
+      this.ram[bank * RAM_BANK_SIZE + (address - MEMORY_RANGES.ECHO_RAM_SWITCHABLE.start)] = value;
       return;
     }
 

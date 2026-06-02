@@ -53,16 +53,11 @@ export default class MBC3 implements IO {
     }
 
     if (inRange(address, MEMORY_RANGES.ROM_SWITCHABLE_BANK)) {
-      return this.rom[
-        this.romBank * 0x4000 +
-          (address - MEMORY_RANGES.ROM_SWITCHABLE_BANK.start)
-      ];
+      return this.rom[this.romBank * 0x4000 + (address - MEMORY_RANGES.ROM_SWITCHABLE_BANK.start)];
     }
 
     if (inRange(address, MEMORY_RANGES.EXTRAM) && this.ramEnabled) {
-      return this.ram[
-        this.ramBank * 0x2000 + (address - MEMORY_RANGES.EXTRAM.start)
-      ];
+      return this.ram[this.ramBank * 0x2000 + (address - MEMORY_RANGES.EXTRAM.start)];
     }
 
     return 0xff;
@@ -87,8 +82,7 @@ export default class MBC3 implements IO {
     }
 
     if (inRange(address, MEMORY_RANGES.EXTRAM) && this.ramEnabled) {
-      this.ram[this.ramBank * 0x2000 + (address - MEMORY_RANGES.EXTRAM.start)] =
-        value;
+      this.ram[this.ramBank * 0x2000 + (address - MEMORY_RANGES.EXTRAM.start)] = value;
       return;
     }
   }

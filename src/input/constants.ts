@@ -9,12 +9,7 @@ export enum Button {
   SELECT,
 }
 
-export const DIRECTION_BUTTONS = [
-  Button.UP,
-  Button.DOWN,
-  Button.LEFT,
-  Button.RIGHT,
-];
+export const DIRECTION_BUTTONS = [Button.UP, Button.DOWN, Button.LEFT, Button.RIGHT];
 export const ACTION_BUTTONS = [Button.A, Button.B, Button.START, Button.SELECT];
 
 export const INPUT_REGISTER = 0xff00;

@@ -61,10 +61,7 @@ export default class MBC1 implements IO {
     }
 
     if (inRange(address, MEMORY_RANGES.ROM_SWITCHABLE_BANK)) {
-      return this.rom[
-        this.romBank * 0x4000 +
-          (address - MEMORY_RANGES.ROM_SWITCHABLE_BANK.start)
-      ];
+      return this.rom[this.romBank * 0x4000 + (address - MEMORY_RANGES.ROM_SWITCHABLE_BANK.start)];
     }
 
     if (inRange(address, MEMORY_RANGES.EXTRAM) && this.ramEnabled) {

@@ -325,9 +325,7 @@ describe('PPU', () => {
       test('does not request an LCD STAT interrupt if flag is clear', () => {
         ppu.horizontalBlankStatInterruptsEnabled = false;
         ppu.horizontalBlankMode();
-        expect(mmu.requestInterrupt).not.toHaveBeenCalledWith(
-          Interrupts.LCD_STAT
-        );
+        expect(mmu.requestInterrupt).not.toHaveBeenCalledWith(Interrupts.LCD_STAT);
       });
 
       test('transitions to OAM scan mode after 51 cycles if LY < 143', () => {
@@ -382,9 +380,7 @@ describe('PPU', () => {
       test('does not request an LCD STAT interrupt if flag is clear', () => {
         ppu.verticalBlankStatInterruptsEnabled = false;
         ppu.verticalBlankMode();
-        expect(mmu.requestInterrupt).not.toHaveBeenCalledWith(
-          Interrupts.LCD_STAT
-        );
+        expect(mmu.requestInterrupt).not.toHaveBeenCalledWith(Interrupts.LCD_STAT);
       });
 
       test('requests a VBLANK interrupt', () => {
@@ -419,9 +415,7 @@ describe('PPU', () => {
       test('does not request an LCD STAT interrupt if flag is clear', () => {
         ppu.oamStatInterruptsEnabled = false;
         ppu.oamScanMode();
-        expect(mmu.requestInterrupt).not.toHaveBeenCalledWith(
-          Interrupts.LCD_STAT
-        );
+        expect(mmu.requestInterrupt).not.toHaveBeenCalledWith(Interrupts.LCD_STAT);
       });
 
       test('transitions to render mode after 20 cycles', () => {

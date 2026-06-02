@@ -1,11 +1,6 @@
 import { Interrupts } from '../cpu/interrupts';
 import type MMU from '../memory/mmu';
-import {
-  Button,
-  ACTION_BUTTONS,
-  DIRECTION_BUTTONS,
-  INPUT_REGISTER,
-} from './constants';
+import { Button, ACTION_BUTTONS, DIRECTION_BUTTONS, INPUT_REGISTER } from './constants';
 import { IO } from '../types';
 
 export default class Input implements IO {

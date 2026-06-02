@@ -91,17 +91,13 @@ describe('APU', () => {
       describe('sweep direction', () => {
         test('sets to increase', () => {
           apu.write(AUDIO_REGISTERS.NR12, 0x08);
-          expect(apu.channel1.initialEnvelopeSweepMode).toEqual(
-            SweepMode.INCREASE
-          );
+          expect(apu.channel1.initialEnvelopeSweepMode).toEqual(SweepMode.INCREASE);
           expect(apu.read(AUDIO_REGISTERS.NR12)).toEqual(0x08);
         });
 
         test('sets to decrease', () => {
           apu.write(AUDIO_REGISTERS.NR12, 0x00);
-          expect(apu.channel1.initialEnvelopeSweepMode).toEqual(
-            SweepMode.DECREASE
-          );
+          expect(apu.channel1.initialEnvelopeSweepMode).toEqual(SweepMode.DECREASE);
           expect(apu.read(AUDIO_REGISTERS.NR12)).toEqual(0x00);
         });
       });
@@ -180,17 +176,13 @@ describe('APU', () => {
       describe('sweep direction', () => {
         test('sets to increase', () => {
           apu.write(AUDIO_REGISTERS.NR22, 0x08);
-          expect(apu.channel2.initialEnvelopeSweepMode).toEqual(
-            SweepMode.INCREASE
-          );
+          expect(apu.channel2.initialEnvelopeSweepMode).toEqual(SweepMode.INCREASE);
           expect(apu.read(AUDIO_REGISTERS.NR22)).toEqual(0x08);
         });
 
         test('sets to decrease', () => {
           apu.write(AUDIO_REGISTERS.NR22, 0x00);
-          expect(apu.channel2.initialEnvelopeSweepMode).toEqual(
-            SweepMode.DECREASE
-          );
+          expect(apu.channel2.initialEnvelopeSweepMode).toEqual(SweepMode.DECREASE);
           expect(apu.read(AUDIO_REGISTERS.NR22)).toEqual(0x00);
         });
       });
@@ -352,17 +344,13 @@ describe('APU', () => {
       describe('sweep direction', () => {
         test('sets to increase', () => {
           apu.write(AUDIO_REGISTERS.NR42, 0x08);
-          expect(apu.channel4.initialEnvelopeSweepMode).toEqual(
-            SweepMode.INCREASE
-          );
+          expect(apu.channel4.initialEnvelopeSweepMode).toEqual(SweepMode.INCREASE);
           expect(apu.read(AUDIO_REGISTERS.NR42)).toEqual(0x08);
         });
 
         test('sets to decrease', () => {
           apu.write(AUDIO_REGISTERS.NR42, 0x00);
-          expect(apu.channel4.initialEnvelopeSweepMode).toEqual(
-            SweepMode.DECREASE
-          );
+          expect(apu.channel4.initialEnvelopeSweepMode).toEqual(SweepMode.DECREASE);
           expect(apu.read(AUDIO_REGISTERS.NR42)).toEqual(0x00);
         });
       });

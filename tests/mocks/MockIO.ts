@@ -12,11 +12,9 @@ export default class MockIO implements IO {
     return this.values[address] ?? 0xff;
   });
 
-  write = vi.fn<(address: number, value: number) => void>(
-    (address: number, value: number) => {
-      this.values[address] = value;
-    }
-  );
+  write = vi.fn<(address: number, value: number) => void>((address: number, value: number) => {
+    this.values[address] = value;
+  });
 
   set(source: number[], offset = 0) {
     this.values.set(source, offset);

@@ -228,18 +228,12 @@ export default class PPU {
         return this.vramBank | 0xfe;
       case GRAPHICS_REGISTERS.BCPS:
         return (
-          (this.incrementBackgroundPaletteIndex ? 0x80 : 0) |
-          0x40 |
-          this.backgroundPaletteIndex
+          (this.incrementBackgroundPaletteIndex ? 0x80 : 0) | 0x40 | this.backgroundPaletteIndex
         );
       case GRAPHICS_REGISTERS.BCPD:
         return this.colorBackgroundPalette[this.backgroundPaletteIndex];
       case GRAPHICS_REGISTERS.OCPS:
-        return (
-          (this.incrementObjectPaletteIndex ? 0x80 : 0) |
-          0x40 |
-          this.objectPaletteIndex
-        );
+        return (this.incrementObjectPaletteIndex ? 0x80 : 0) | 0x40 | this.objectPaletteIndex;
       case GRAPHICS_REGISTERS.OCPD:
         return this.colorObjectPalette[this.objectPaletteIndex];
       case GRAPHICS_REGISTERS.HDMA1:
@@ -344,8 +338,7 @@ export default class PPU {
         }
         this.colorBackgroundPalette[this.backgroundPaletteIndex] = value;
         if (this.incrementBackgroundPaletteIndex) {
-          this.backgroundPaletteIndex =
-            (this.backgroundPaletteIndex + 1) & 0x3f;
+          this.backgroundPaletteIndex = (this.backgroundPaletteIndex + 1) & 0x3f;
         }
         return;
       case GRAPHICS_REGISTERS.OCPS:
@@ -380,8 +373,7 @@ export default class PPU {
         if (!this.cgbMode) {
           return;
         }
-        this.vramDmaDestination =
-          (value << 8) | (this.vramDmaDestination & 0x00ff);
+        this.vramDmaDestination = (value << 8) | (this.vramDmaDestination & 0x00ff);
         return;
       case GRAPHICS_REGISTERS.HDMA4:
         if (!this.cgbMode) {
@@ -403,9 +395,7 @@ export default class PPU {
   }
 
   vramReadWord(address: number, bank = this.vramBank & 0x01) {
-    return (
-      (this.vramRead(address + 1, bank) << 8) | this.vramRead(address, bank)
-    );
+    return (this.vramRead(address + 1, bank) << 8) | this.vramRead(address, bank);
   }
 
   vramWrite(address: number, value: number, bank = this.vramBank & 0x01) {
@@ -599,12 +589,7 @@ export default class PPU {
     }
   }
 
-  getTiles(
-    tileMapAddress: number,
-    row: number,
-    rowInTile: number,
-    max: number
-  ): TileAttributes[] {
+  getTiles(tileMapAddress: number, row: number, rowInTile: number, max: number): TileAttributes[] {
     if (!this.mmu) {
       return [];
     }
@@ -614,10 +599,7 @@ export default class PPU {
       const tileDataIndex = this.mmu.read(mapAddress);
 
       if (this.cgbMode) {
-        const tileAttributes = this.vramRead(
-          mapAddress - MEMORY_RANGES.VRAM.start,
-          1
-        );
+        const tileAttributes = this.vramRead(mapAddress - MEMORY_RANGES.VRAM.start, 1);
 
         const bank = (tileAttributes & 0x08) >> 3;
         const flipY = Boolean(tileAttributes & 0x40);
@@ -636,9 +618,7 @@ export default class PPU {
         };
       } else {
         const address =
-          this.getTileAddress(tileDataIndex) +
-          rowInTile * 2 -
-          MEMORY_RANGES.VRAM.start;
+          this.getTileAddress(tileDataIndex) + rowInTile * 2 - MEMORY_RANGES.VRAM.start;
         tiles[i] = {
           priority: false,
           flipY: false,
@@ -659,18 +639,12 @@ export default class PPU {
 
   getBackgroundColor(palette: number, colorIndex: number) {
     const offset = palette * 8 + colorIndex * 2;
-    return (
-      (this.colorBackgroundPalette[offset + 1] << 8) +
-      this.colorBackgroundPalette[offset]
-    );
+    return (this.colorBackgroundPalette[offset + 1] << 8) + this.colorBackgroundPalette[offset];
   }
 
   getObjectColor(palette: number, colorIndex: number) {
     const offset = palette * 8 + colorIndex * 2;
-    return (
-      (this.colorObjectPalette[offset + 1] << 8) +
-      this.colorObjectPalette[offset]
-    );
+    return (this.colorObjectPalette[offset + 1] << 8) + this.colorObjectPalette[offset];
   }
 
   drawLine() {
@@ -694,16 +668,11 @@ export default class PPU {
       const windowX = x - (this.wx - 7);
       const useWindowTile = drawWindow && windowX >= 0;
 
-      const tile = useWindowTile
-        ? windowTiles[windowX >> 3]
-        : bgTiles[bgX >> 3];
+      const tile = useWindowTile ? windowTiles[windowX >> 3] : bgTiles[bgX >> 3];
 
       const tilePixelX = (useWindowTile ? windowX : bgX) % 8;
 
-      const color = this.getTilePixel(
-        tile.data,
-        tile.flipX ? 7 - tilePixelX : tilePixelX
-      );
+      const color = this.getTilePixel(tile.data, tile.flipX ? 7 - tilePixelX : tilePixelX);
       this.backgroundPixels[x] = {
         colorIndex: color,
         color: this.cgbMode
@@ -750,9 +719,7 @@ export default class PPU {
         objects.push(object);
       }
     }
-    objects.sort((a, b) =>
-      a.x === b.x || this.cgbMode ? a.address - b.address : a.x - b.x
-    );
+    objects.sort((a, b) => (a.x === b.x || this.cgbMode ? a.address - b.address : a.x - b.x));
     return objects;
   }
 
@@ -762,12 +729,8 @@ export default class PPU {
     for (let j = 0; j < this.objects.length; j++) {
       const object = this.objects[j];
 
-      const palette = object.paletteFlag
-        ? this.objectPalette1
-        : this.objectPalette0;
-      const tileY = object.flipY
-        ? objectSize - (this.ly - object.y) - 1
-        : this.ly - object.y;
+      const palette = object.paletteFlag ? this.objectPalette1 : this.objectPalette0;
+      const tileY = object.flipY ? objectSize - (this.ly - object.y) - 1 : this.ly - object.y;
 
       let tileIndex = object.tile;
       if (this.objectSizeFlag) {
@@ -793,10 +756,7 @@ export default class PPU {
           continue;
         }
 
-        const colorIndex = this.getTilePixel(
-          tileData,
-          object.flipX ? 7 - k : k
-        );
+        const colorIndex = this.getTilePixel(tileData, object.flipX ? 7 - k : k);
 
         if (colorIndex === 0) {
           continue;

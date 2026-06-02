@@ -1,11 +1,7 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import CPU from '../../src/cpu/cpu';
 import { Interrupts } from '../../src/cpu/interrupts';
-import {
-  MemoryReference,
-  Register,
-  Register8Bit,
-} from '../../src/cpu/registers';
+import { MemoryReference, Register, Register8Bit } from '../../src/cpu/registers';
 import MMU from '../../src/memory/mmu';
 import MockIO from '../mocks/MockIO';
 
@@ -41,8 +37,7 @@ describe('CPU', () => {
 
   function getCurrentState() {
     const { registers, ticks } = cpu;
-    const { a, b, c, d, e, f, h, l, sp, pc, ime, stop, halt, hlReference } =
-      registers;
+    const { a, b, c, d, e, f, h, l, sp, pc, ime, stop, halt, hlReference } = registers;
     return {
       a,
       b,

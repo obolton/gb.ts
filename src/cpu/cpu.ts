@@ -3,12 +3,7 @@ import PPU from '../graphics/ppu';
 import Timer from '../timer/timer';
 import { Interrupts } from './interrupts';
 import { toSignedInt } from '../utils';
-import Registers, {
-  Register,
-  Register16Bit,
-  MemoryReference,
-  Register8Bit,
-} from './registers';
+import Registers, { Register, Register16Bit, MemoryReference, Register8Bit } from './registers';
 
 export default class CPU {
   registers: Registers;
@@ -35,10 +30,7 @@ export default class CPU {
 
   run() {
     if (!this.frameInterval) {
-      this.frameInterval = window.setInterval(
-        this.runFrame.bind(this),
-        this.doubleSpeed ? 8 : 16
-      );
+      this.frameInterval = window.setInterval(this.runFrame.bind(this), this.doubleSpeed ? 8 : 16);
     }
   }
 
@@ -720,10 +712,7 @@ export default class CPU {
       this.mmu.speed = this.doubleSpeed ? 0x80 : 0;
       const interval = this.doubleSpeed ? 8 : 16;
       clearInterval(this.frameInterval || 0);
-      this.frameInterval = window.setInterval(
-        this.runFrame.bind(this),
-        interval
-      );
+      this.frameInterval = window.setInterval(this.runFrame.bind(this), interval);
     } else {
       this.registers.stop = true;
     }
@@ -794,9 +783,7 @@ export default class CPU {
   ldSPPlusImmediate() {
     const value = toSignedInt(this.fetchImmediate());
     this.half = Boolean(((this.registers.sp & 0x0f) + (value & 0x0f)) & 0x10);
-    this.carry = Boolean(
-      ((this.registers.sp & 0xff) + (value & 0xff)) & 0x0100
-    );
+    this.carry = Boolean(((this.registers.sp & 0xff) + (value & 0xff)) & 0x0100);
     const sum = this.registers.sp + value;
     this.registers.hl = sum & 0xffff;
     this.zero = false;
@@ -909,9 +896,7 @@ export default class CPU {
   addSPImmediate() {
     const value = toSignedInt(this.fetchImmediate());
     this.half = Boolean(((this.registers.sp & 0x0f) + (value & 0x0f)) & 0x10);
-    this.carry = Boolean(
-      ((this.registers.sp & 0xff) + (value & 0xff)) & 0x0100
-    );
+    this.carry = Boolean(((this.registers.sp & 0xff) + (value & 0xff)) & 0x0100);
     const sum = this.registers.sp + value;
     this.registers.sp = sum & 0xffff;
     this.zero = false;
@@ -921,8 +906,7 @@ export default class CPU {
 
   add16Bit(register: Register16Bit) {
     this.half = Boolean(
-      ((this.registers.hl & 0x0fff) + (this.registers[register] & 0x0fff)) &
-        0x1000
+      ((this.registers.hl & 0x0fff) + (this.registers[register] & 0x0fff)) & 0x1000
     );
     const sum = this.registers.hl + this.registers[register];
     this.registers.hl = sum & 0xffff;
@@ -937,9 +921,7 @@ export default class CPU {
     this.registers.a = sum & 0xff;
     this.zero = this.registers.a === 0;
     this.subtraction = false;
-    this.half = Boolean(
-      ((value & 0xf) + (amount & 0xf) + (this.carry ? 1 : 0)) & 0x10
-    );
+    this.half = Boolean(((value & 0xf) + (amount & 0xf) + (this.carry ? 1 : 0)) & 0x10);
     this.carry = sum > 0xff;
     this.ticks += ticks;
   }
@@ -1228,8 +1210,7 @@ export default class CPU {
 
   rla() {
     const carry = Boolean(this.registers.a & 0x80);
-    this.registers.a =
-      ((this.registers.a << 1) & 0xff) + (this.carry ? 0x1 : 0);
+    this.registers.a = ((this.registers.a << 1) & 0xff) + (this.carry ? 0x1 : 0);
     this.zero = false;
     this.subtraction = false;
     this.half = false;
