@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import MBC3 from '../../src/memory/mbc3';
 import { MEMORY_REGISTERS } from '../../src/memory/constants';
 import MOCK_ROM from '../mocks/rom';

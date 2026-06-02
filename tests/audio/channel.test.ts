@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, test } from 'vitest';
 import Channel from '../../src/audio/channel';
 import { SweepMode } from '../../src/audio/constants';
 import AudioContext from '../mocks/AudioContext';

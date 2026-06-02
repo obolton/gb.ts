@@ -1,9 +1,10 @@
+import { describe, expect, test, vi } from 'vitest';
 import APU from '../../src/audio/apu';
 import { AUDIO_REGISTERS } from '../../src/audio/constants';
 import { SweepMode } from '../../src/audio/constants';
 import AudioContext from '../mocks/AudioContext';
 
-global.AudioContext = AudioContext;
+globalThis.AudioContext = AudioContext;
 
 const WAVE = [0, 16, 255, 64, 255, 64, 32, 8, 0, 96, 80, 0, 0, 128, 255, 64];
 
@@ -151,7 +152,7 @@ describe('APU', () => {
       });
 
       test('trigger', () => {
-        jest.spyOn(apu.channel1, 'trigger');
+        vi.spyOn(apu.channel1, 'trigger');
         expect(apu.channel1.enabled).toBe(false);
         apu.write(AUDIO_REGISTERS.NR14, 0x80);
         expect(apu.channel1.enabled).toBe(true);
@@ -240,7 +241,7 @@ describe('APU', () => {
       });
 
       test('trigger', () => {
-        jest.spyOn(apu.channel2, 'trigger');
+        vi.spyOn(apu.channel2, 'trigger');
         expect(apu.channel2.enabled).toBe(false);
         apu.write(AUDIO_REGISTERS.NR24, 0x80);
         expect(apu.channel2.enabled).toBe(true);
@@ -251,13 +252,13 @@ describe('APU', () => {
 
   describe('channel 3: wave channel', () => {
     describe('NR30: DAC enable', () => {
-      it('enables DAC', () => {
+      test('enables DAC', () => {
         apu.write(AUDIO_REGISTERS.NR30, 0x80);
         expect(apu.channel3.dacEnabled).toBe(true);
         expect(apu.read(AUDIO_REGISTERS.NR30)).toEqual(0xff);
       });
 
-      it('disables DAC', () => {
+      test('disables DAC', () => {
         apu.write(AUDIO_REGISTERS.NR30, 0x00);
         expect(apu.channel3.dacEnabled).toBe(false);
         expect(apu.read(AUDIO_REGISTERS.NR30)).toEqual(0x7f);
@@ -271,25 +272,25 @@ describe('APU', () => {
     });
 
     describe('NR32: output level', () => {
-      it('mutes', () => {
+      test('mutes', () => {
         apu.write(AUDIO_REGISTERS.NR32, 0x00);
         expect(apu.channel3.initialVolume).toEqual(0);
         expect(apu.read(AUDIO_REGISTERS.NR32)).toEqual(0x9f);
       });
 
-      it('sets output level to 100%', () => {
+      test('sets output level to 100%', () => {
         apu.write(AUDIO_REGISTERS.NR32, 0x20);
         expect(apu.channel3.initialVolume).toEqual(7);
         expect(apu.read(AUDIO_REGISTERS.NR32)).toEqual(0xbf);
       });
 
-      it('sets output level to 50%', () => {
+      test('sets output level to 50%', () => {
         apu.write(AUDIO_REGISTERS.NR32, 0x40);
         expect(apu.channel3.initialVolume).toEqual(3);
         expect(apu.read(AUDIO_REGISTERS.NR32)).toEqual(0xdf);
       });
 
-      it('sets output level to 25%', () => {
+      test('sets output level to 25%', () => {
         apu.write(AUDIO_REGISTERS.NR32, 0x60);
         expect(apu.channel3.initialVolume).toEqual(1);
         expect(apu.read(AUDIO_REGISTERS.NR32)).toEqual(0xff);
@@ -325,7 +326,7 @@ describe('APU', () => {
       });
 
       test('trigger', () => {
-        jest.spyOn(apu.channel3, 'trigger');
+        vi.spyOn(apu.channel3, 'trigger');
         expect(apu.channel3.enabled).toBe(false);
         apu.write(AUDIO_REGISTERS.NR34, 0x80);
         expect(apu.channel3.enabled).toBe(true);
@@ -427,7 +428,7 @@ describe('APU', () => {
       });
 
       test('trigger', () => {
-        jest.spyOn(apu.channel4, 'trigger');
+        vi.spyOn(apu.channel4, 'trigger');
         expect(apu.channel4.enabled).toBe(false);
         apu.write(AUDIO_REGISTERS.NR44, 0x80);
         expect(apu.channel4.enabled).toBe(true);
@@ -447,10 +448,10 @@ describe('APU', () => {
 
   describe('clock', () => {
     test('steps length timer every 2 ticks', () => {
-      jest.spyOn(apu.channel1, 'step');
-      jest.spyOn(apu.channel2, 'step');
-      jest.spyOn(apu.channel3, 'step');
-      jest.spyOn(apu.channel4, 'step');
+      vi.spyOn(apu.channel1, 'step');
+      vi.spyOn(apu.channel2, 'step');
+      vi.spyOn(apu.channel3, 'step');
+      vi.spyOn(apu.channel4, 'step');
 
       apu.clock = 0;
 
@@ -465,7 +466,7 @@ describe('APU', () => {
     });
 
     test('steps channel 1 period sweep every 4 ticks', () => {
-      jest.spyOn(apu.channel1, 'periodSweep');
+      vi.spyOn(apu.channel1, 'periodSweep');
 
       apu.clock = 0;
 
@@ -477,9 +478,9 @@ describe('APU', () => {
     });
 
     test('steps channel 1, 2 and 4 envelope sweep every 8 ticks', () => {
-      jest.spyOn(apu.channel1, 'envelopeSweep');
-      jest.spyOn(apu.channel2, 'envelopeSweep');
-      jest.spyOn(apu.channel4, 'envelopeSweep');
+      vi.spyOn(apu.channel1, 'envelopeSweep');
+      vi.spyOn(apu.channel2, 'envelopeSweep');
+      vi.spyOn(apu.channel4, 'envelopeSweep');
 
       apu.clock = 0;
 

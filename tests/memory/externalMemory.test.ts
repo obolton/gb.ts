@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import ExternalMemory from '../../src/memory/externalMemory';
 import { MEMORY_REGISTERS } from '../../src/memory/constants';
 import MBC0 from '../../src/memory/mbc0';

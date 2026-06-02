@@ -1,3 +1,4 @@
+import { describe, expect, test, vi } from 'vitest';
 import MMU from '../../src/memory/mmu';
 import ExternalMemory from '../../src/memory/externalMemory';
 import MOCK_ROM from '../mocks/rom';
@@ -21,7 +22,7 @@ describe('MMU', () => {
   });
 
   test('reads and writes to EXTRAM', () => {
-    const spy = jest.spyOn(externalMemory, 'write');
+    const spy = vi.spyOn(externalMemory, 'write');
     mmu.write(0xa000, 0x0a);
     expect(spy).toHaveBeenCalledWith(0xa000, 0x0a);
     expect(mmu.read(0xa000)).toEqual(0x0a);

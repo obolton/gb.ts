@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import type { IO } from '../../src/types';
 
 export default class MockIO implements IO {
@@ -7,11 +8,11 @@ export default class MockIO implements IO {
     this.values = new Uint8Array(length);
   }
 
-  read = jest.fn((address: number) => {
+  read = vi.fn((address: number) => {
     return this.values[address] ?? 0xff;
   });
 
-  write = jest.fn((address: number, value: number) => {
+  write = vi.fn((address: number, value: number) => {
     this.values[address] = value;
   });
 

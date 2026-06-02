@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import CPU from '../../src/cpu/cpu';
 import { Interrupts } from '../../src/cpu/interrupts';
 import {
@@ -8,7 +9,7 @@ import {
 import MMU from '../../src/memory/mmu';
 import MockIO from '../mocks/MockIO';
 
-jest.useFakeTimers();
+vi.useFakeTimers();
 
 const INITIAL_STATE = {
   a: 0,
@@ -2262,7 +2263,7 @@ describe('CPU', () => {
 
     describe('prefixed opcodes', () => {
       test('CBxx', () => {
-        jest.spyOn(cpu, 'executePrefixed');
+        vi.spyOn(cpu, 'executePrefixed');
         mockIO.set([0x02], cpu.registers.pc);
         cpu.execute(0xcb);
         expect(cpu.executePrefixed).toHaveBeenCalledWith(0x02);

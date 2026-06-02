@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import Input from '../../src/input/input';
 import { Button, INPUT_REGISTER } from '../../src/input/constants';
 import { Interrupts } from '../../src/cpu/interrupts';
@@ -7,7 +8,7 @@ describe('Input', () => {
   const mmu = new MMU();
 
   beforeEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   test('initializes the register to the expected value', () => {
@@ -19,7 +20,7 @@ describe('Input', () => {
     const input = new Input();
     input.mmu = mmu;
     input.write(INPUT_REGISTER, 0x20);
-    jest.spyOn(mmu, 'requestInterrupt');
+    vi.spyOn(mmu, 'requestInterrupt');
 
     test('right', () => {
       input.buttonDown(Button.RIGHT);
@@ -84,7 +85,7 @@ describe('Input', () => {
     });
   });
 
-  it('requests a joypad interrupt', () => {
+  test('requests a joypad interrupt', () => {
     const input = new Input();
     input.mmu = mmu;
     input.write(INPUT_REGISTER, 0x10);
@@ -92,8 +93,8 @@ describe('Input', () => {
     expect(mmu.requestInterrupt).toHaveBeenCalledWith(Interrupts.JOYPAD);
   });
 
-  it('does not request an interrupt if the appropriate button type is not selected', () => {
-    const requestInterrupt = jest.fn();
+  test('does not request an interrupt if the appropriate button type is not selected', () => {
+    const requestInterrupt = vi.fn();
     const input = new Input();
     input.mmu = mmu;
     input.write(INPUT_REGISTER, 0x20);

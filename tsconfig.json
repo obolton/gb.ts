@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
-    "types": ["jest"],
+    "types": [],
     "rootDir": "./",
     "skipLibCheck": true
   }

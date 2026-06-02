@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import PulseChannel from '../../src/audio/pulseChannel';
 import { SweepMode } from '../../src/audio/constants';
 import AudioContext from '../mocks/AudioContext';

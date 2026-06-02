@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import MBC2 from '../../src/memory/mbc2';
 import MOCK_ROM from '../mocks/rom';
 

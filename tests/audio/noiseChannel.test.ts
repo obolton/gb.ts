@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest';
 import NoiseChannel from '../../src/audio/noiseChannel';
 import AudioContext from '../mocks/AudioContext';
 

@@ -8,19 +8,19 @@
   "scripts": {
     "build": "esbuild src/ui/index.ts --bundle --outdir=public --minify",
     "start": "esbuild src/ui/index.ts --bundle --sourcemap --watch --outdir=public --servedir=public",
-    "test": "jest --coverage"
+    "test": "vitest run --coverage",
+    "test:watch": "vitest"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.5",
     "@typescript-eslint/eslint-plugin": "^6.7.2",
     "@typescript-eslint/parser": "^6.7.2",
+    "@vitest/coverage-v8": "^4.1.7",
     "esbuild": "0.19.2",
     "eslint": "^8.49.0",
     "eslint-config-prettier": "^9.0.0",
-    "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0",
+    "jsdom": "^29.1.1",
     "prettier": "3.0.3",
-    "ts-jest": "^29.1.1",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.7"
   }
 }

@@ -1,10 +1,11 @@
+import { describe, expect, test, vi } from 'vitest';
 import Timer from '../../src/timer/timer';
 import { FREQUENCIES, TIMER_REGISTERS } from '../../src/timer/constants';
 import MMU from '../../src/memory/mmu';
 import ExternalMemory from '../../src/memory/externalMemory';
 import MOCK_ROM from '../mocks/rom';
 
-jest.mock('../../src/audio/apu');
+vi.mock('../../src/audio/apu');
 
 describe('Timer', () => {
   test('initializes registers with expected values', () => {
@@ -99,7 +100,7 @@ describe('Timer', () => {
     const timer = new Timer();
     const mmu = new MMU();
     mmu.externalMemory = new ExternalMemory(MOCK_ROM);
-    jest.spyOn(mmu, 'requestInterrupt');
+    vi.spyOn(mmu, 'requestInterrupt');
     timer.mmu = mmu;
     timer.write(TIMER_REGISTERS.TIMA, 0xff);
     timer.write(TIMER_REGISTERS.TAC, 0x04);

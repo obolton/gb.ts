@@ -1,5 +1,6 @@
-/** @jest-environment jsdom */
+/** @vitest-environment jsdom */
 
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import PPU, { Mode } from '../../src/graphics/ppu';
 import { Interrupts } from '../../src/cpu/interrupts';
 import ExternalMemory from '../../src/memory/externalMemory';
@@ -218,7 +219,7 @@ describe('PPU', () => {
     });
 
     test('DMA', () => {
-      jest.spyOn(mmu, 'dma');
+      vi.spyOn(mmu, 'dma');
       ppu.write(GRAPHICS_REGISTERS.DMA, 0x01);
       expect(mmu.dma).toHaveBeenCalledTimes(1);
       expect(ppu.read(GRAPHICS_REGISTERS.DMA)).toEqual(0x01);
@@ -293,8 +294,8 @@ describe('PPU', () => {
 
   describe('modes', () => {
     beforeEach(() => {
-      jest.resetAllMocks();
-      jest.spyOn(mmu, 'requestInterrupt');
+      vi.resetAllMocks();
+      vi.spyOn(mmu, 'requestInterrupt');
       ppu.enabled = true;
       ppu.objectsEnabled = true;
       ppu.windowEnabled = true;
