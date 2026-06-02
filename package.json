@@ -5,6 +5,7 @@
   "author": "Oliver Bolton",
   "license": "MIT",
   "main": "src/gb.ts",
+  "packageManager": "pnpm@11.5.1",
   "scripts": {
     "build": "esbuild src/ui/index.ts --bundle --outdir=public --minify",
     "start": "esbuild src/ui/index.ts --bundle --sourcemap --watch --outdir=public --servedir=public",

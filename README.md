@@ -30,14 +30,14 @@ Tested in:
 
 ### Requirements
 
-- NPM
+- pnpm
 
 ### Starting the development server
 
 Run the following command:
 
 ```sh
-npm start
+pnpm start
 ```
 
 Then open the local/network URL displayed in your web browser.
@@ -47,7 +47,7 @@ Then open the local/network URL displayed in your web browser.
 To build a static version:
 
 ```sh
-npm run build
+pnpm run build
 ```
 
 Built files are placed in `public/`.
