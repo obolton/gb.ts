@@ -29,7 +29,7 @@ describe('MBC1', () => {
     test('throws for an unsupported RAM size', () => {
       const rom = new Uint8Array(MOCK_ROM);
       rom[MEMORY_REGISTERS.RAM_SIZE] = 1;
-      expect(() => new MBC1(rom)).toThrow();
+      expect(() => new MBC1(rom)).toThrow('Unsupported external RAM size');
     });
   });
 

@@ -64,7 +64,6 @@ describe('Channel', () => {
   });
 
   test('disables', () => {
-    const channel = new Channel(audioContext, outputNode);
     channel.trigger();
     channel.disable();
     expect(channel.enabled).toBe(false);
@@ -72,7 +71,6 @@ describe('Channel', () => {
 
   describe('length timer', () => {
     test('steps if length timer is enabled', () => {
-      const channel = new Channel(audioContext, outputNode);
       channel.initialLength = 64;
       channel.enableLengthTimer = true;
       channel.trigger();
@@ -84,7 +82,6 @@ describe('Channel', () => {
     });
 
     test('does not step if length timer is disabled', () => {
-      const channel = new Channel(audioContext, outputNode);
       channel.initialLength = 64;
       channel.enableLengthTimer = false;
       channel.trigger();
@@ -94,7 +91,7 @@ describe('Channel', () => {
     });
 
     test('does not step if channel is disabled', () => {
-      const channel = new Channel(audioContext, outputNode);
+      channel.disable();
       channel.initialLength = 64;
       channel.length = 64;
       channel.enableLengthTimer = true;
@@ -103,7 +100,6 @@ describe('Channel', () => {
     });
 
     test('disables the channel if the length reaches 0', () => {
-      const channel = new Channel(audioContext, outputNode);
       channel.initialLength = 2;
       channel.enableLengthTimer = true;
       channel.trigger();

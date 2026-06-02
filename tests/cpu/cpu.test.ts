@@ -2823,7 +2823,7 @@ describe('CPU', () => {
       [0xfd],
       [-1],
     ])('invalid opcode', (opcode) => {
-      expect(() => cpu.execute(opcode)).toThrow();
+      expect(() => cpu.execute(opcode)).toThrow('Invalid opcode');
     });
 
     describe('flags', () => {

@@ -94,7 +94,7 @@ describe('Input', () => {
   });
 
   test('does not request an interrupt if the appropriate button type is not selected', () => {
-    const requestInterrupt = vi.fn();
+    const requestInterrupt = vi.fn<() => void>();
     const input = new Input();
     input.mmu = mmu;
     input.write(INPUT_REGISTER, 0x20);

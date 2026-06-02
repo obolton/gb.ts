@@ -49,10 +49,6 @@ export default class WaveChannel extends Channel {
     }
   }
 
-  constructor(audioContext: AudioContext, outputNode: AudioNode) {
-    super(audioContext, outputNode);
-  }
-
   reset() {
     super.reset();
     this.wave = new Uint8Array(16);
