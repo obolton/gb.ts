@@ -1,5 +1,4 @@
 node_modules/
 coverage/
 .DS_Store
-public/index.js
-public/index.css
+dist/

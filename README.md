@@ -50,7 +50,7 @@ To build a static version:
 pnpm run build
 ```
 
-Built files are placed in `public/`.
+Built files are placed in `dist/`.
 
 ## Helpful resources
 
