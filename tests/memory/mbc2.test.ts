@@ -46,15 +46,24 @@ describe('MBC2', () => {
       expect(mbc.read(0xa000)).toEqual(0xff);
     });
 
-    test('enables RAM when 0x0a is written to lower range', () => {
+    test.each([
+      ['0x0a', 0x0a],
+      ['0x1a', 0x1a],
+      ['0xfa', 0xfa],
+    ])('enables RAM when 0xa is written to the lower range (%s)', (_label, value) => {
       const mbc = new MBC2(MOCK_ROM);
-      mbc.write(0x0000, 0x0a);
+      mbc.write(0x0000, value);
       expect(mbc.ramEnabled).toBe(true);
     });
 
-    test('does not enable RAM when another value is written to lower range', () => {
+    test.each([
+      ['0x00', 0x00],
+      ['0x01', 0x01],
+      ['0x0b', 0x0b],
+      ['0x1b', 0x1b],
+    ])('does not enable RAM when lower range does not equal 0xa', (_label, value) => {
       const mbc = new MBC2(MOCK_ROM);
-      mbc.write(0x0000, 0x01);
+      mbc.write(0x0000, value);
       expect(mbc.ramEnabled).toBe(false);
     });
 

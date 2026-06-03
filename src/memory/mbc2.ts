@@ -42,7 +42,7 @@ export default class MBC2 implements IO {
         }
         this.romBank = bank & (this.romBanks - 1);
       } else {
-        this.ramEnabled = value === 0x0a;
+        this.ramEnabled = (value & 0x0f) === 0x0a;
       }
       return;
     }
