@@ -197,6 +197,14 @@ describe('CPU', () => {
         expect(mmu.read(0x1235)).toEqual(0xff);
       });
 
+      test('LD [a16], SP wraps past 0xffff', () => {
+        mockIO.set([0xff, 0xff], cpu.registers.pc); // a16 = 0xffff
+        cpu.registers.sp = 0xabcd;
+        cpu.execute(0x08);
+        expect(mmu.ie).toEqual(0xcd);
+        expect(mmu.read(0x0000)).toEqual(0xab);
+      });
+
       test('LD [a16], A', () => {
         cpu.registers.a = 0x0f;
         cpu.registers.pc = 0x1234;
@@ -2900,7 +2908,7 @@ describe('CPU', () => {
           cpu.execute(0x18);
           expect(getCurrentState()).toEqual({
             ...previousState,
-            pc: previousState.pc - 3,
+            pc: (previousState.pc - 3) & 0xffff,
             ticks: 3,
           });
         });
@@ -2926,7 +2934,7 @@ describe('CPU', () => {
           expect(getCurrentState()).toEqual({
             ...previousState,
             f: 0x00,
-            pc: previousState.pc - 3,
+            pc: (previousState.pc - 3) & 0xffff,
             ticks: 3,
           });
         });
@@ -2964,7 +2972,7 @@ describe('CPU', () => {
           expect(getCurrentState()).toEqual({
             ...previousState,
             f: 0x80,
-            pc: previousState.pc - 3,
+            pc: (previousState.pc - 3) & 0xffff,
             ticks: 3,
           });
         });
@@ -3002,7 +3010,7 @@ describe('CPU', () => {
           expect(getCurrentState()).toEqual({
             ...previousState,
             f: 0x00,
-            pc: previousState.pc - 3,
+            pc: (previousState.pc - 3) & 0xffff,
             ticks: 3,
           });
         });
@@ -3040,7 +3048,7 @@ describe('CPU', () => {
           expect(getCurrentState()).toEqual({
             ...previousState,
             f: 0x10,
-            pc: previousState.pc - 3,
+            pc: (previousState.pc - 3) & 0xffff,
             ticks: 3,
           });
         });

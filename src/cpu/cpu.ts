@@ -807,7 +807,7 @@ export default class CPU {
   ldSPToAddress() {
     const address = this.fetchImmediateWord();
     this.mmu.write(address, this.registers.sp & 0xff);
-    this.mmu.write(address + 1, this.registers.sp >> 8);
+    this.mmu.write((address + 1) & 0xffff, this.registers.sp >> 8);
     this.ticks += 5;
   }
 
@@ -991,7 +991,7 @@ export default class CPU {
   jr(condition: boolean) {
     const steps = toSignedInt(this.fetchImmediate());
     if (condition) {
-      this.registers.pc += steps;
+      this.registers.pc = (this.registers.pc + steps) & 0xffff;
       this.ticks += 3;
     } else {
       this.ticks += 2;
