@@ -626,7 +626,7 @@ export default class PPU {
     const tiles = [];
     for (let i = 0; i < max; i++) {
       const mapAddress = tileMapAddress + row * 32 + i;
-      const tileDataIndex = this.mmu.read(mapAddress);
+      const tileDataIndex = this.vramRead(mapAddress - MEMORY_RANGES.VRAM.start, 0);
 
       if (this.cgbMode) {
         const tileAttributes = this.vramRead(mapAddress - MEMORY_RANGES.VRAM.start, 1);

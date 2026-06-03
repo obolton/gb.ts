@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
 
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import PPU, { Mode } from '../../src/graphics/ppu';
 import { Interrupts } from '../../src/cpu/interrupts';
 import ExternalMemory from '../../src/memory/externalMemory';
@@ -541,6 +541,32 @@ describe('PPU', () => {
       ppu.reset();
       expect(ppu.enabled).toBe(true);
       expect(ppu.read(GRAPHICS_REGISTERS.LCDC) & 0x80).toEqual(0x80);
+    });
+  });
+
+  describe('CGB', () => {
+    beforeEach(() => {
+      ppu.reset();
+      ppu.cgbMode = true;
+    });
+
+    afterEach(() => {
+      ppu.cgbMode = false;
+    });
+
+    test('fetches the tile map index from bank 0 regardless of VBK', () => {
+      ppu.tileDataAreaFlag = true;
+
+      ppu.vramWrite(0x10, 0xcd, 0);
+      ppu.vramWrite(0x11, 0xab, 0);
+      ppu.vramWrite(0x1800, 0x01, 0); 
+      ppu.vramWrite(0x1800, 0x02, 1);
+
+      ppu.vramBank = 1;
+
+      const [tile] = ppu.getTiles(0x9800, 0, 0, 1);
+      expect(tile.data).toEqual(0xabcd);
+      expect(tile.palette).toEqual(2);
     });
   });
 });
