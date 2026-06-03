@@ -24,6 +24,7 @@ type MemoryType =
   | 'ROM_FIXED_BANK'
   | 'ROM_SWITCHABLE_BANK'
   | 'INPUT'
+  | 'SERIAL'
   | 'TIMER'
   | 'AUDIO'
   | 'LCD'
@@ -46,6 +47,7 @@ export const MEMORY_RANGES: Record<MemoryType, AddressRange> = {
   ROM_FIXED_BANK: { start: 0x0000, end: 0x3fff },
   ROM_SWITCHABLE_BANK: { start: 0x4000, end: 0x7fff },
   INPUT: { start: 0xff00, end: 0xff00 },
+  SERIAL: { start: 0xff01, end: 0xff02 },
   TIMER: { start: 0xff04, end: 0xff07 },
   AUDIO: { start: 0xff10, end: 0xff3f },
   LCD: { start: 0xff40, end: 0xff6c },

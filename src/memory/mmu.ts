@@ -9,6 +9,7 @@ export default class MMU {
   apu?: IO;
   timer?: IO;
   input?: IO;
+  serial?: IO;
   externalMemory?: IO;
 
   ram: Uint8Array;
@@ -85,6 +86,10 @@ export default class MMU {
 
       if (inRange(address, MEMORY_RANGES.INPUT) && this.input) {
         return this.input.read(address);
+      }
+
+      if (inRange(address, MEMORY_RANGES.SERIAL) && this.serial) {
+        return this.serial.read(address);
       }
 
       if (inRange(address, MEMORY_RANGES.TIMER) && this.timer) {
@@ -180,6 +185,10 @@ export default class MMU {
 
       if (inRange(address, MEMORY_RANGES.INPUT) && this.input) {
         return this.input.write(address, value);
+      }
+
+      if (inRange(address, MEMORY_RANGES.SERIAL) && this.serial) {
+        return this.serial.write(address, value);
       }
 
       if (inRange(address, MEMORY_RANGES.TIMER) && this.timer) {

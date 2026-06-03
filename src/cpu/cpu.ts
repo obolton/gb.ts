@@ -1,6 +1,7 @@
 import MMU from '../memory/mmu';
 import PPU from '../graphics/ppu';
 import Timer from '../timer/timer';
+import Serial from '../serial/serial';
 import { Interrupts } from './interrupts';
 import { toSignedInt } from '../utils';
 import Registers, { Register, Register16Bit, MemoryReference, Register8Bit } from './registers';
@@ -10,6 +11,7 @@ export default class CPU {
   mmu: MMU;
   ppu?: PPU;
   timer?: Timer;
+  serial?: Serial;
   ticks = 0;
   frameInterval: number | null;
   doubleSpeed = false;
@@ -51,6 +53,7 @@ export default class CPU {
 
       this.ppu?.step(this.ticks);
       this.timer?.step(this.ticks);
+      this.serial?.step(this.ticks);
 
       frameTicks += this.ticks;
     }

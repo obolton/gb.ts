@@ -4,6 +4,7 @@ import PPU from './graphics/ppu';
 import APU from './audio/apu';
 import Timer from './timer/timer';
 import Input from './input/input';
+import Serial from './serial/serial';
 import ExternalMemory from './memory/externalMemory';
 
 export default class GameBoy {
@@ -14,6 +15,7 @@ export default class GameBoy {
   apu: APU;
   timer: Timer;
   input: Input;
+  serial: Serial;
   externalMemory?: ExternalMemory;
   running = false;
   cgbMode = false;
@@ -32,6 +34,9 @@ export default class GameBoy {
     this.input = new Input();
     this.input.mmu = this.mmu;
 
+    this.serial = new Serial();
+    this.serial.mmu = this.mmu;
+
     this.ppu = new PPU(this.display);
     this.ppu.mmu = this.mmu;
 
@@ -39,10 +44,12 @@ export default class GameBoy {
     this.mmu.apu = this.apu;
     this.mmu.timer = this.timer;
     this.mmu.input = this.input;
+    this.mmu.serial = this.serial;
 
     this.cpu = new CPU(this.mmu);
     this.cpu.ppu = this.ppu;
     this.cpu.timer = this.timer;
+    this.cpu.serial = this.serial;
   }
 
   start(rom: Uint8Array) {
@@ -55,6 +62,7 @@ export default class GameBoy {
 
     this.cgbMode = this.externalMemory.isCGBCompatible();
     this.ppu.cgbMode = this.cgbMode;
+    this.serial.cgbMode = this.cgbMode;
     this.cpu.run();
     this.running = true;
   }
@@ -64,6 +72,7 @@ export default class GameBoy {
     this.cpu.reset();
     this.timer.reset();
     this.input.reset();
+    this.serial.reset();
     this.ppu.reset();
     this.apu.reset();
     this.running = false;
