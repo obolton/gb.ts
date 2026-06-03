@@ -22,7 +22,7 @@ export default class MMU {
   constructor() {
     this.ram = new Uint8Array(32768);
     this.oam = new Uint8Array(160);
-    this.hram = new Uint8Array(126);
+    this.hram = new Uint8Array(127);
     this.ie = 0x00;
     this.if = 0x00;
     this.ramBank = 1;
@@ -32,7 +32,7 @@ export default class MMU {
   reset() {
     this.ram = new Uint8Array(32768);
     this.oam = new Uint8Array(160);
-    this.hram = new Uint8Array(126);
+    this.hram = new Uint8Array(127);
     this.ie = 0x00;
     this.if = 0x00;
     this.ramBank = 1;
