@@ -458,7 +458,7 @@ export default class PPU {
     if (this.enabled) {
       return;
     }
-    
+
     this.enabled = true;
     this.resetMode();
   }
