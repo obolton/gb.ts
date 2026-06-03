@@ -3531,5 +3531,17 @@ describe('CPU', () => {
       cpu.checkInterrupts();
       expect(cpu.registers.halt).toEqual(false);
     });
+
+    test('services the highest-priority pending interrupt', () => {
+      mmu.write(0xffff, 0xff);
+      mmu.write(0xff0f, Interrupts.VBLANK.flag | Interrupts.TIMER.flag);
+      cpu.registers.ime = 1;
+
+      cpu.checkInterrupts();
+
+      expect(cpu.registers.pc).toEqual(Interrupts.VBLANK.handlerAddress);
+      expect(cpu.registers.ime).toEqual(0);
+      expect(mmu.read(0xff0f) & 0x1f).toEqual(Interrupts.TIMER.flag);
+    });
   });
 });

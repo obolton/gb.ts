@@ -672,14 +672,15 @@ export default class CPU {
       return;
     }
 
-    Object.values(Interrupts).forEach((interrupt) => {
+    for (const interrupt of Object.values(Interrupts)) {
       if (interrupts & interrupt.flag) {
         this.registers.ime = 0;
         this.mmu.write(0xff0f, this.mmu.read(0xff0f) ^ interrupt.flag);
         this.rst(interrupt.handlerAddress);
         this.ticks += 1;
+        return;
       }
-    });
+    }
   }
 
   invalid(opcode: number) {
