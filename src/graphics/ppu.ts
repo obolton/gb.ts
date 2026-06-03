@@ -68,7 +68,7 @@ export default class PPU {
   tileDataAreaFlag = false;
   windowEnabled = false;
   windowTileMapAreaFlag = false;
-  enabled = false;
+  enabled = true;
 
   mode = Mode.HORIZONTAL_BLANK;
   ly = 0;
@@ -129,7 +129,7 @@ export default class PPU {
     this.tileDataAreaFlag = false;
     this.windowEnabled = false;
     this.windowTileMapAreaFlag = false;
-    this.enabled = false;
+    this.enabled = true;
 
     this.mode = Mode.HORIZONTAL_BLANK;
     this.ly = 0;
@@ -261,7 +261,6 @@ export default class PPU {
 
     switch (address) {
       case GRAPHICS_REGISTERS.LCDC:
-        this.enabled = Boolean(value & 0x80);
         this.windowTileMapAreaFlag = Boolean(value & 0x40);
         this.windowEnabled = Boolean(value & 0x20);
         this.tileDataAreaFlag = Boolean(value & 0x10);
@@ -269,6 +268,12 @@ export default class PPU {
         this.objectSizeFlag = Boolean(value & 0x04);
         this.objectsEnabled = Boolean(value & 0x02);
         this.backgroundWindowEnabled = Boolean(value & 0x01);
+
+        if (value & 0x80) {
+          this.enable();
+        } else {
+          this.disable();
+        }
         return;
       case GRAPHICS_REGISTERS.STAT:
         this.lycInterruptsEnabled = Boolean(value & 0x40);
@@ -403,6 +408,10 @@ export default class PPU {
   }
 
   step(count: number) {
+    if (!this.enabled) {
+      return;
+    }
+
     this.clock += count;
 
     switch (this.mode) {
@@ -443,6 +452,27 @@ export default class PPU {
         }
         break;
     }
+  }
+
+  enable() {
+    if (this.enabled) {
+      return;
+    }
+    
+    this.enabled = true;
+    this.resetMode();
+  }
+
+  disable() {
+    if (!this.enabled) {
+      return;
+    }
+
+    this.enabled = false;
+    this.ly = 0;
+    this.wly = 0;
+    this.clock = 0;
+    this.mode = Mode.HORIZONTAL_BLANK;
   }
 
   resetMode() {
@@ -660,7 +690,7 @@ export default class PPU {
 
     const windowTileMap = this.windowTileMapAreaFlag ? 0x9c00 : 0x9800;
     const windowTiles = drawWindow
-      ? this.getTiles(windowTileMap, this.wly >> 3, this.wly % 8, 20)
+      ? this.getTiles(windowTileMap, this.wly >> 3, this.wly % 8, 21)
       : [];
 
     for (let x = 0; x < SCREEN_WIDTH; x++) {

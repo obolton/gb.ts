@@ -32,8 +32,8 @@ describe('PPU', () => {
 
   describe('registers', () => {
     describe('LCDC', () => {
-      test('defaults flags to off', () => {
-        expect(ppu.read(GRAPHICS_REGISTERS.LCDC)).toEqual(0x00);
+      test('defaults to LCD enabled with other flags off', () => {
+        expect(ppu.read(GRAPHICS_REGISTERS.LCDC)).toEqual(0x80);
       });
 
       test('enables', () => {
@@ -440,6 +440,107 @@ describe('PPU', () => {
         ppu.step(1);
         expect(ppu.mode).toEqual(Mode.HORIZONTAL_BLANK);
       });
+    });
+  });
+
+  describe('disable', () => {
+    beforeEach(() => {
+      ppu.enabled = true;
+      ppu.objectsEnabled = false;
+      ppu.lycInterruptsEnabled = false;
+      ppu.oamStatInterruptsEnabled = false;
+    });
+
+    test('sets the PPU at LY 0 in mode 0', () => {
+      ppu.ly = 100;
+      ppu.wly = 50;
+      ppu.clock = 30;
+      ppu.mode = Mode.RENDER;
+
+      ppu.write(GRAPHICS_REGISTERS.LCDC, 0x00);
+
+      expect(ppu.enabled).toBe(false);
+      expect(ppu.ly).toEqual(0);
+      expect(ppu.wly).toEqual(0);
+      expect(ppu.clock).toEqual(0);
+      expect(ppu.mode).toEqual(Mode.HORIZONTAL_BLANK);
+    });
+
+    test('reads LY as 0 while off', () => {
+      ppu.ly = 100;
+      ppu.write(GRAPHICS_REGISTERS.LCDC, 0x00);
+      expect(ppu.read(GRAPHICS_REGISTERS.LY)).toEqual(0);
+    });
+
+    test('reads mode 0 from STAT while off', () => {
+      ppu.mode = Mode.RENDER;
+      ppu.write(GRAPHICS_REGISTERS.LCDC, 0x00);
+      expect(ppu.read(GRAPHICS_REGISTERS.STAT) & 0x03).toEqual(Mode.HORIZONTAL_BLANK);
+    });
+
+    test('halts the PPU', () => {
+      ppu.enabled = false;
+      ppu.clock = 0;
+      ppu.mode = Mode.OAM_SCAN;
+
+      ppu.step(100);
+
+      expect(ppu.clock).toEqual(0);
+      expect(ppu.mode).toEqual(Mode.OAM_SCAN);
+    });
+  });
+
+  describe('enable', () => {
+    beforeEach(() => {
+      ppu.enabled = true;
+      ppu.objectsEnabled = false;
+      ppu.lycInterruptsEnabled = false;
+      ppu.oamStatInterruptsEnabled = false;
+    });
+
+    test('starts a new frame in OAM scan at LY 0', () => {
+      ppu.enabled = false;
+      ppu.ly = 50;
+      ppu.clock = 30;
+
+      ppu.write(GRAPHICS_REGISTERS.LCDC, 0x80);
+
+      expect(ppu.enabled).toBe(true);
+      expect(ppu.ly).toEqual(0);
+      expect(ppu.clock).toEqual(0);
+      expect(ppu.mode).toEqual(Mode.OAM_SCAN);
+    });
+
+    test('restarts at LY 0', () => {
+      ppu.ly = 100;
+      ppu.write(GRAPHICS_REGISTERS.LCDC, 0x00);
+      expect(ppu.ly).toEqual(0);
+
+      ppu.write(GRAPHICS_REGISTERS.LCDC, 0x80);
+      expect(ppu.enabled).toBe(true);
+      expect(ppu.ly).toEqual(0);
+      expect(ppu.mode).toEqual(Mode.OAM_SCAN);
+    });
+
+    test('does not restart the frame when already enabled', () => {
+      ppu.mode = Mode.RENDER;
+      ppu.ly = 75;
+      ppu.clock = 30;
+
+      ppu.write(GRAPHICS_REGISTERS.LCDC, 0x81);
+
+      expect(ppu.mode).toEqual(Mode.RENDER);
+      expect(ppu.ly).toEqual(75);
+      expect(ppu.clock).toEqual(30);
+      expect(ppu.backgroundWindowEnabled).toBe(true);
+    });
+  });
+
+  describe('reset', () => {
+    test('leaves the LCD enabled', () => {
+      ppu.reset();
+      expect(ppu.enabled).toBe(true);
+      expect(ppu.read(GRAPHICS_REGISTERS.LCDC) & 0x80).toEqual(0x80);
     });
   });
 });
