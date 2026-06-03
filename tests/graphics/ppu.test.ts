@@ -559,7 +559,7 @@ describe('PPU', () => {
 
       ppu.vramWrite(0x10, 0xcd, 0);
       ppu.vramWrite(0x11, 0xab, 0);
-      ppu.vramWrite(0x1800, 0x01, 0); 
+      ppu.vramWrite(0x1800, 0x01, 0);
       ppu.vramWrite(0x1800, 0x02, 1);
 
       ppu.vramBank = 1;
