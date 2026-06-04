@@ -241,7 +241,7 @@ export default class APU {
           value & 0x08 ? SweepMode.INCREASE : SweepMode.DECREASE;
         this.channel1.initialEnvelopeSweepPace = value & 0x07;
         this.channel1.dacEnabled = Boolean(value & 0xf8);
-        this.channel1.updateGain();
+        this.channel1.updateDac();
         return;
 
       case AUDIO_REGISTERS.NR13:
@@ -270,7 +270,7 @@ export default class APU {
           value & 0x08 ? SweepMode.INCREASE : SweepMode.DECREASE;
         this.channel2.initialEnvelopeSweepPace = value & 0x07;
         this.channel2.dacEnabled = Boolean(value & 0xf8);
-        this.channel2.updateGain();
+        this.channel2.updateDac();
         return;
 
       case AUDIO_REGISTERS.NR23:
@@ -289,7 +289,7 @@ export default class APU {
       // Channel 3
       case AUDIO_REGISTERS.NR30:
         this.channel3.dacEnabled = Boolean(value & 0x80);
-        this.channel3.updateGain();
+        this.channel3.updateDac();
         return;
 
       case AUDIO_REGISTERS.NR31:
@@ -327,7 +327,7 @@ export default class APU {
           value & 0x08 ? SweepMode.INCREASE : SweepMode.DECREASE;
         this.channel4.initialEnvelopeSweepPace = value & 0x07;
         this.channel4.dacEnabled = Boolean(value & 0xf8);
-        this.channel4.updateGain();
+        this.channel4.updateDac();
         return;
 
       case AUDIO_REGISTERS.NR43:

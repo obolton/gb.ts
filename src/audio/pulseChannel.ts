@@ -69,6 +69,15 @@ export default class PulseChannel extends Channel {
     this.periodPaceCount = 0;
 
     super.trigger();
+
+    if (this.periodSweepSlope !== 0 && this.nextPeriod() > 0x07ff) {
+      this.disable();
+    }
+  }
+
+  private nextPeriod() {
+    const direction = this.periodSweepMode === SweepMode.INCREASE ? 1 : -1;
+    return Math.floor(this.period + direction * (this.period / (1 << this.periodSweepSlope)));
   }
 
   periodSweep() {
@@ -79,10 +88,7 @@ export default class PulseChannel extends Channel {
     this.periodPaceCount++;
 
     if (this.periodPaceCount >= this.periodSweepPace) {
-      const direction = this.periodSweepMode === SweepMode.INCREASE ? 1 : -1;
-      const newPeriod = Math.floor(
-        this.period + direction * (this.period / (1 << this.periodSweepSlope))
-      );
+      const newPeriod = this.nextPeriod();
 
       // Disable the period if the new value would overflow even if the slope is disabled
       if (newPeriod > 0x07ff) {

@@ -89,7 +89,7 @@ export default class Channel {
   }
 
   trigger() {
-    this.enabled = true;
+    this.enabled = this.dacEnabled;
     this.volume = this.initialVolume;
     this.length = this.initialLength;
     this.envelopeSweepMode = this.initialEnvelopeSweepMode;
@@ -101,6 +101,14 @@ export default class Channel {
   disable() {
     this.enabled = false;
     this.gainNode.gain.value = 0;
+  }
+
+  updateDac() {
+    if (this.dacEnabled) {
+      this.updateGain();
+    } else {
+      this.disable();
+    }
   }
 
   step() {

@@ -159,6 +159,7 @@ describe('APU', () => {
       });
 
       test('trigger', () => {
+        apu.write(AUDIO_REGISTERS.NR12, 0xf0);
         vi.spyOn(apu.channel1, 'trigger');
         expect(apu.channel1.enabled).toBe(false);
         apu.write(AUDIO_REGISTERS.NR14, 0x80);
@@ -252,6 +253,7 @@ describe('APU', () => {
       });
 
       test('trigger', () => {
+        apu.write(AUDIO_REGISTERS.NR22, 0xf0);
         vi.spyOn(apu.channel2, 'trigger');
         expect(apu.channel2.enabled).toBe(false);
         apu.write(AUDIO_REGISTERS.NR24, 0x80);
@@ -337,6 +339,7 @@ describe('APU', () => {
       });
 
       test('trigger', () => {
+        apu.write(AUDIO_REGISTERS.NR30, 0x80);
         vi.spyOn(apu.channel3, 'trigger');
         expect(apu.channel3.enabled).toBe(false);
         apu.write(AUDIO_REGISTERS.NR34, 0x80);
@@ -435,6 +438,7 @@ describe('APU', () => {
       });
 
       test('trigger', () => {
+        apu.write(AUDIO_REGISTERS.NR42, 0xf0);
         vi.spyOn(apu.channel4, 'trigger');
         expect(apu.channel4.enabled).toBe(false);
         apu.write(AUDIO_REGISTERS.NR44, 0x80);

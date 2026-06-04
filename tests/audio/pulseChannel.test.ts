@@ -20,6 +20,7 @@ describe('PulseChannel', () => {
   describe('period sweep', () => {
     test('increases the period if sweep mode is increase', () => {
       const pulseChannel = new PulseChannel(audioContext, outputNode);
+      pulseChannel.dacEnabled = true;
       pulseChannel.initialPeriodSweepPace = 1;
       pulseChannel.periodSweepMode = SweepMode.INCREASE;
       pulseChannel.periodSweepSlope = 2;
@@ -33,6 +34,7 @@ describe('PulseChannel', () => {
 
     test('decreases the period if sweep mode is decrease', () => {
       const pulseChannel = new PulseChannel(audioContext, outputNode);
+      pulseChannel.dacEnabled = true;
       pulseChannel.initialPeriodSweepPace = 1;
       pulseChannel.periodSweepMode = SweepMode.DECREASE;
       pulseChannel.periodSweepSlope = 2;
@@ -46,6 +48,7 @@ describe('PulseChannel', () => {
 
     test('sweeps at the sweep pace', () => {
       const pulseChannel = new PulseChannel(audioContext, outputNode);
+      pulseChannel.dacEnabled = true;
       pulseChannel.initialPeriodSweepPace = 3;
       pulseChannel.periodSweepMode = SweepMode.INCREASE;
       pulseChannel.periodSweepSlope = 2;
@@ -69,6 +72,7 @@ describe('PulseChannel', () => {
 
     test('disables the channel if the period would overflow', () => {
       const pulseChannel = new PulseChannel(audioContext, outputNode);
+      pulseChannel.dacEnabled = true;
       pulseChannel.initialPeriodSweepPace = 1;
       pulseChannel.periodSweepMode = SweepMode.INCREASE;
       pulseChannel.periodSweepSlope = 1;
@@ -83,6 +87,7 @@ describe('PulseChannel', () => {
 
     test('does not adjust the period if the period sweep pace is zero', () => {
       const pulseChannel = new PulseChannel(audioContext, outputNode);
+      pulseChannel.dacEnabled = true;
       pulseChannel.initialPeriodSweepPace = 0;
       pulseChannel.periodSweepMode = SweepMode.INCREASE;
       pulseChannel.periodSweepSlope = 1;
@@ -90,6 +95,16 @@ describe('PulseChannel', () => {
       pulseChannel.trigger();
       pulseChannel.periodSweep();
       expect(pulseChannel.period).toEqual(256);
+    });
+
+    test('disables the channel on trigger if the sweep would overflow', () => {
+      const pulseChannel = new PulseChannel(audioContext, outputNode);
+      pulseChannel.dacEnabled = true;
+      pulseChannel.periodSweepMode = SweepMode.INCREASE;
+      pulseChannel.periodSweepSlope = 1;
+      pulseChannel.period = 2000;
+      pulseChannel.trigger();
+      expect(pulseChannel.enabled).toBe(false);
     });
   });
 

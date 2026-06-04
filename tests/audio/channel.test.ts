@@ -34,6 +34,12 @@ describe('Channel', () => {
       expect(channel.gainNode.gain.value).toEqual(0);
     });
 
+    test('does not enable the channel if DAC is disabled', () => {
+      channel.dacEnabled = false;
+      channel.trigger();
+      expect(channel.enabled).toBe(false);
+    });
+
     test('sets the volume to 0 if not mixed into either channel', () => {
       channel.mixLeft = false;
       channel.mixRight = false;
@@ -66,6 +72,14 @@ describe('Channel', () => {
   test('disables', () => {
     channel.trigger();
     channel.disable();
+    expect(channel.enabled).toBe(false);
+  });
+
+  test('disables the channel when the DAC is turned off', () => {
+    channel.trigger();
+    expect(channel.enabled).toBe(true);
+    channel.dacEnabled = false;
+    channel.updateDac();
     expect(channel.enabled).toBe(false);
   });
 
