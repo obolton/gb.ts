@@ -277,6 +277,7 @@ export default class APU {
 
       case AUDIO_REGISTERS.NR32:
         this.channel3.outputLevel = (value & 0x60) >> 5;
+        this.channel3.updateGain();
         return;
 
       case AUDIO_REGISTERS.NR33:

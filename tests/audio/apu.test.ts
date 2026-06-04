@@ -1,4 +1,4 @@
-import { describe, expect, test, vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import APU from '../../src/audio/apu';
 import { AUDIO_REGISTERS } from '../../src/audio/constants';
 import { SweepMode } from '../../src/audio/constants';
@@ -282,25 +282,25 @@ describe('APU', () => {
     describe('NR32: output level', () => {
       test('mutes', () => {
         apu.write(AUDIO_REGISTERS.NR32, 0x00);
-        expect(apu.channel3.initialVolume).toEqual(0);
+        expect(apu.channel3.outputLevel).toEqual(0);
         expect(apu.read(AUDIO_REGISTERS.NR32)).toEqual(0x9f);
       });
 
       test('sets output level to 100%', () => {
         apu.write(AUDIO_REGISTERS.NR32, 0x20);
-        expect(apu.channel3.initialVolume).toEqual(7);
+        expect(apu.channel3.outputLevel).toEqual(1);
         expect(apu.read(AUDIO_REGISTERS.NR32)).toEqual(0xbf);
       });
 
       test('sets output level to 50%', () => {
         apu.write(AUDIO_REGISTERS.NR32, 0x40);
-        expect(apu.channel3.initialVolume).toEqual(3);
+        expect(apu.channel3.outputLevel).toEqual(2);
         expect(apu.read(AUDIO_REGISTERS.NR32)).toEqual(0xdf);
       });
 
       test('sets output level to 25%', () => {
         apu.write(AUDIO_REGISTERS.NR32, 0x60);
-        expect(apu.channel3.initialVolume).toEqual(1);
+        expect(apu.channel3.outputLevel).toEqual(3);
         expect(apu.read(AUDIO_REGISTERS.NR32)).toEqual(0xff);
       });
     });
@@ -531,14 +531,43 @@ describe('APU', () => {
     test('NR30 disabling the DAC silences the wave channel without a retrigger', () => {
       apu.channel3.enabled = true;
       apu.channel3.dacEnabled = true;
-      apu.channel3.volume = 7;
+      apu.channel3.outputLevel = 1;
       apu.channel3.mixLeft = true;
       apu.channel3.mixRight = true;
       apu.channel3.updateGain();
-      expect(apu.channel3.gainNode.gain.value).toEqual(7 / 15);
+      expect(apu.channel3.gainNode.gain.value).toEqual(1);
 
       apu.write(AUDIO_REGISTERS.NR30, 0x00);
       expect(apu.channel3.dacEnabled).toBe(false);
+      expect(apu.channel3.gainNode.gain.value).toEqual(0);
+    });
+  });
+
+  describe('wave channel output level scaling', () => {
+    beforeEach(() => {
+      apu.channel3.enabled = true;
+      apu.channel3.dacEnabled = true;
+      apu.channel3.mixLeft = true;
+      apu.channel3.mixRight = true;
+    });
+
+    test('scales the gain to full output', () => {
+      apu.write(AUDIO_REGISTERS.NR32, 0x20);
+      expect(apu.channel3.gainNode.gain.value).toEqual(1);
+    });
+
+    test('scales the gain to half output', () => {
+      apu.write(AUDIO_REGISTERS.NR32, 0x40);
+      expect(apu.channel3.gainNode.gain.value).toEqual(0.5);
+    });
+
+    test('scales the gain to quarter output', () => {
+      apu.write(AUDIO_REGISTERS.NR32, 0x60);
+      expect(apu.channel3.gainNode.gain.value).toEqual(0.25);
+    });
+
+    test('mutes the output', () => {
+      apu.write(AUDIO_REGISTERS.NR32, 0x00);
       expect(apu.channel3.gainNode.gain.value).toEqual(0);
     });
   });

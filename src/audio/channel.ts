@@ -62,9 +62,9 @@ export default class Channel {
   }
 
   updateGain() {
-    const volume = this.volume / 0xf;
+    const gain = this.outputGain();
     this.gainNode.gain.value =
-      this.enabled && this.dacEnabled && (this.mixLeft || this.mixRight) ? volume : 0;
+      this.enabled && this.dacEnabled && (this.mixLeft || this.mixRight) ? gain : 0;
 
     // Center
     if (this.mixLeft && this.mixRight) {
@@ -82,6 +82,10 @@ export default class Channel {
     } else {
       this.stereoPannerNode.pan.value = 0;
     }
+  }
+
+  protected outputGain() {
+    return this.volume / 0xf;
   }
 
   trigger() {
