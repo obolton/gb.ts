@@ -1,6 +1,9 @@
 import Channel from './channel';
 import { SweepMode } from './constants';
 
+const DUTY_CYCLES = [0.125, 0.25, 0.5, 0.75];
+const DUTY_HARMONICS = 64;
+
 export default class PulseChannel extends Channel {
   initialPeriodSweepPace = 0;
   private periodSweepPace = 0;
@@ -10,16 +13,35 @@ export default class PulseChannel extends Channel {
   private periodValue = 0;
 
   waveDuty = 0;
+  private dutyWaves: PeriodicWave[];
 
   node: OscillatorNode;
 
   constructor(audioContext: AudioContext, outputNode: AudioNode) {
     super(audioContext, outputNode);
 
+    this.dutyWaves = DUTY_CYCLES.map((duty) => this.createDutyWave(duty));
+
     this.node = audioContext.createOscillator();
-    this.node.type = 'square';
+    this.updateDuty();
     this.node.connect(this.gainNode);
     this.node.start();
+  }
+
+  private createDutyWave(duty: number): PeriodicWave {
+    const cosineTerms = new Float32Array(DUTY_HARMONICS + 1);
+    const sineTerms = new Float32Array(DUTY_HARMONICS + 1);
+
+    for (let n = 1; n <= DUTY_HARMONICS; n++) {
+      cosineTerms[n] = (2 * Math.sin(2 * Math.PI * n * duty)) / (Math.PI * n);
+      sineTerms[n] = (2 * (1 - Math.cos(2 * Math.PI * n * duty))) / (Math.PI * n);
+    }
+
+    return this.audioContext.createPeriodicWave(cosineTerms, sineTerms);
+  }
+
+  updateDuty() {
+    this.node.setPeriodicWave(this.dutyWaves[this.waveDuty]);
   }
 
   reset() {

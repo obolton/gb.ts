@@ -14,6 +14,7 @@ class MockPannerNode extends MockAudioNode {
 class MockOscillatorNode extends MockAudioNode {
   frequency = { value: 0 };
   start() {}
+  setPeriodicWave() {}
 }
 
 class MockAudioBuffer {
@@ -42,6 +43,9 @@ class MockAudioContext {
   }
   createOscillator() {
     return new MockOscillatorNode();
+  }
+  createPeriodicWave() {
+    return {};
   }
   createBuffer() {
     return new MockAudioBuffer();

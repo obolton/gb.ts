@@ -207,6 +207,7 @@ export default class APU {
       case AUDIO_REGISTERS.NR11:
         this.channel1.waveDuty = value >> 6;
         this.channel1.initialLength = 64 - (value & 0x3f);
+        this.channel1.updateDuty();
         return;
 
       case AUDIO_REGISTERS.NR12:
@@ -215,6 +216,7 @@ export default class APU {
           value & 0x08 ? SweepMode.INCREASE : SweepMode.DECREASE;
         this.channel1.initialEnvelopeSweepPace = value & 0x07;
         this.channel1.dacEnabled = Boolean(value & 0xf8);
+        this.channel1.updateGain();
         return;
 
       case AUDIO_REGISTERS.NR13:
@@ -234,6 +236,7 @@ export default class APU {
       case AUDIO_REGISTERS.NR21:
         this.channel2.waveDuty = value >> 6;
         this.channel2.initialLength = 64 - (value & 0x3f);
+        this.channel2.updateDuty();
         return;
 
       case AUDIO_REGISTERS.NR22:

@@ -79,6 +79,14 @@ describe('APU', () => {
         expect(apu.channel1.initialLength).toEqual(45);
         expect(apu.read(AUDIO_REGISTERS.NR11)).toEqual(0x3f);
       });
+
+      test('duty cycle', () => {
+        vi.spyOn(apu.channel1, 'updateDuty');
+        apu.write(AUDIO_REGISTERS.NR11, 0xc0);
+        expect(apu.channel1.waveDuty).toEqual(3);
+        expect(apu.channel1.updateDuty).toHaveBeenCalledTimes(1);
+        expect(apu.read(AUDIO_REGISTERS.NR11)).toEqual(0xff);
+      });
     });
 
     describe('NR12: volume and envelope', () => {
@@ -163,6 +171,14 @@ describe('APU', () => {
         apu.write(AUDIO_REGISTERS.NR21, 0x13);
         expect(apu.channel2.initialLength).toEqual(45);
         expect(apu.read(AUDIO_REGISTERS.NR21)).toEqual(0x3f);
+      });
+
+      test('duty cycle', () => {
+        vi.spyOn(apu.channel2, 'updateDuty');
+        apu.write(AUDIO_REGISTERS.NR21, 0xc0);
+        expect(apu.channel2.waveDuty).toEqual(3);
+        expect(apu.channel2.updateDuty).toHaveBeenCalledTimes(1);
+        expect(apu.read(AUDIO_REGISTERS.NR21)).toEqual(0xff);
       });
     });
 

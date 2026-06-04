@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 import PulseChannel from '../../src/audio/pulseChannel';
 import { SweepMode } from '../../src/audio/constants';
 import AudioContext from '../mocks/AudioContext';
@@ -90,6 +90,37 @@ describe('PulseChannel', () => {
       pulseChannel.trigger();
       pulseChannel.periodSweep();
       expect(pulseChannel.period).toEqual(256);
+    });
+  });
+
+  describe('duty cycle', () => {
+    test('selects a distinct waveform for each duty cycle', () => {
+      const pulseChannel = new PulseChannel(audioContext, outputNode);
+      const setPeriodicWave = vi.spyOn(pulseChannel.node, 'setPeriodicWave');
+
+      const waves = [0, 1, 2, 3].map((duty) => {
+        pulseChannel.waveDuty = duty;
+        pulseChannel.updateDuty();
+        return setPeriodicWave.mock.lastCall?.[0];
+      });
+
+      expect(new Set(waves).size).toEqual(4);
+    });
+
+    test('reuses the same waveform for a given duty cycle', () => {
+      const pulseChannel = new PulseChannel(audioContext, outputNode);
+      const setPeriodicWave = vi.spyOn(pulseChannel.node, 'setPeriodicWave');
+
+      pulseChannel.waveDuty = 3;
+      pulseChannel.updateDuty();
+      const wave = setPeriodicWave.mock.lastCall?.[0];
+
+      pulseChannel.waveDuty = 1;
+      pulseChannel.updateDuty();
+      pulseChannel.waveDuty = 3;
+      pulseChannel.updateDuty();
+
+      expect(setPeriodicWave.mock.lastCall?.[0]).toBe(wave);
     });
   });
 });
