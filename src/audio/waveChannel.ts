@@ -47,12 +47,13 @@ export default class WaveChannel extends Channel {
       buffer[sampleIndex + 1] = (value & 0x0f) / 7.5 - 1;
     }
     const sampleRate = 2097152 / (2048 - this.periodValue);
-    const audioBuffer = this.audioContext.createBuffer(1, 32, sampleRate);
+    const audioBuffer = this.audioContext.createBuffer(1, 32, this.audioContext.sampleRate);
     audioBuffer.copyToChannel(buffer, 0, 0);
-    // this.audioBufferSourceNode.playbackRate.value = (playbackRate / sampleRate) / 1000;
+
     this.audioBufferSourceNode = this.audioContext.createBufferSource();
     this.audioBufferSourceNode.buffer = audioBuffer;
     this.audioBufferSourceNode.loop = true;
+    this.audioBufferSourceNode.playbackRate.value = sampleRate / this.audioContext.sampleRate;
     this.audioBufferSourceNode.start();
     this.audioBufferSourceNode.connect(this.gainNode);
 

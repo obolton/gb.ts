@@ -18,6 +18,14 @@ class MockOscillatorNode extends MockAudioNode {
 }
 
 class MockAudioBuffer {
+  numberOfChannels: number;
+  length: number;
+  sampleRate: number;
+  constructor(numberOfChannels: number, length: number, sampleRate: number) {
+    this.numberOfChannels = numberOfChannels;
+    this.length = length;
+    this.sampleRate = sampleRate;
+  }
   copyToChannel() {}
 }
 
@@ -47,8 +55,8 @@ class MockAudioContext {
   createPeriodicWave() {
     return {};
   }
-  createBuffer() {
-    return new MockAudioBuffer();
+  createBuffer(numberOfChannels: number, length: number, sampleRate: number) {
+    return new MockAudioBuffer(numberOfChannels, length, sampleRate);
   }
   createBufferSource() {
     return new MockAudioBufferSourceNode();
