@@ -497,4 +497,49 @@ describe('APU', () => {
       }
     });
   });
+
+  describe('register changes apply to a playing channel immediately', () => {
+    test('NR51 re-routes a channel without a retrigger', () => {
+      apu.channel1.dacEnabled = true;
+      apu.channel1.initialVolume = 15;
+      apu.channel1.mixLeft = true;
+      apu.channel1.mixRight = true;
+      apu.channel1.trigger();
+      expect(apu.channel1.gainNode.gain.value).toEqual(1);
+
+      apu.write(AUDIO_REGISTERS.NR51, 0x10);
+      expect(apu.channel1.gainNode.gain.value).toEqual(1);
+      expect(apu.channel1.stereoPannerNode.pan.value).toEqual(-1);
+
+      apu.write(AUDIO_REGISTERS.NR51, 0x00);
+      expect(apu.channel1.gainNode.gain.value).toEqual(0);
+    });
+
+    test('NR12 disabling the DAC silences a channel without a retrigger', () => {
+      apu.channel1.dacEnabled = true;
+      apu.channel1.initialVolume = 15;
+      apu.channel1.mixLeft = true;
+      apu.channel1.mixRight = true;
+      apu.channel1.trigger();
+      expect(apu.channel1.gainNode.gain.value).toEqual(1);
+
+      apu.write(AUDIO_REGISTERS.NR12, 0x00);
+      expect(apu.channel1.dacEnabled).toBe(false);
+      expect(apu.channel1.gainNode.gain.value).toEqual(0);
+    });
+
+    test('NR30 disabling the DAC silences the wave channel without a retrigger', () => {
+      apu.channel3.enabled = true;
+      apu.channel3.dacEnabled = true;
+      apu.channel3.volume = 7;
+      apu.channel3.mixLeft = true;
+      apu.channel3.mixRight = true;
+      apu.channel3.updateGain();
+      expect(apu.channel3.gainNode.gain.value).toEqual(7 / 15);
+
+      apu.write(AUDIO_REGISTERS.NR30, 0x00);
+      expect(apu.channel3.dacEnabled).toBe(false);
+      expect(apu.channel3.gainNode.gain.value).toEqual(0);
+    });
+  });
 });
