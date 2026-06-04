@@ -145,13 +145,13 @@ describe('APU', () => {
         test('enables length timer', () => {
           apu.write(AUDIO_REGISTERS.NR14, 0x40);
           expect(apu.channel1.enableLengthTimer).toBe(true);
-          expect(apu.read(AUDIO_REGISTERS.NR14)).toEqual(0x40);
+          expect(apu.read(AUDIO_REGISTERS.NR14)).toEqual(0xff);
         });
 
         test('disables length timer', () => {
           apu.write(AUDIO_REGISTERS.NR14, 0x00);
           expect(apu.channel1.enableLengthTimer).toBe(false);
-          expect(apu.read(AUDIO_REGISTERS.NR14)).toEqual(0x00);
+          expect(apu.read(AUDIO_REGISTERS.NR14)).toEqual(0xbf);
         });
       });
 
@@ -238,13 +238,13 @@ describe('APU', () => {
         test('enables length timer', () => {
           apu.write(AUDIO_REGISTERS.NR24, 0x40);
           expect(apu.channel2.enableLengthTimer).toBe(true);
-          expect(apu.read(AUDIO_REGISTERS.NR24)).toEqual(0x40);
+          expect(apu.read(AUDIO_REGISTERS.NR24)).toEqual(0xff);
         });
 
         test('disables length timer', () => {
           apu.write(AUDIO_REGISTERS.NR24, 0x00);
           expect(apu.channel2.enableLengthTimer).toBe(false);
-          expect(apu.read(AUDIO_REGISTERS.NR24)).toEqual(0x00);
+          expect(apu.read(AUDIO_REGISTERS.NR24)).toEqual(0xbf);
         });
       });
 
@@ -323,13 +323,13 @@ describe('APU', () => {
         test('enables length timer', () => {
           apu.write(AUDIO_REGISTERS.NR34, 0x40);
           expect(apu.channel3.enableLengthTimer).toBe(true);
-          expect(apu.read(AUDIO_REGISTERS.NR34)).toEqual(0x40);
+          expect(apu.read(AUDIO_REGISTERS.NR34)).toEqual(0xff);
         });
 
         test('disables length timer', () => {
           apu.write(AUDIO_REGISTERS.NR34, 0x00);
           expect(apu.channel3.enableLengthTimer).toBe(false);
-          expect(apu.read(AUDIO_REGISTERS.NR34)).toEqual(0x00);
+          expect(apu.read(AUDIO_REGISTERS.NR34)).toEqual(0xbf);
         });
       });
 
@@ -421,13 +421,13 @@ describe('APU', () => {
         test('enables length timer', () => {
           apu.write(AUDIO_REGISTERS.NR44, 0x40);
           expect(apu.channel4.enableLengthTimer).toBe(true);
-          expect(apu.read(AUDIO_REGISTERS.NR44)).toEqual(0x7f);
+          expect(apu.read(AUDIO_REGISTERS.NR44)).toEqual(0xff);
         });
 
         test('disables length timer', () => {
           apu.write(AUDIO_REGISTERS.NR44, 0x00);
           expect(apu.channel4.enableLengthTimer).toBe(false);
-          expect(apu.read(AUDIO_REGISTERS.NR44)).toEqual(0x3f);
+          expect(apu.read(AUDIO_REGISTERS.NR44)).toEqual(0xbf);
         });
       });
 

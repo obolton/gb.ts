@@ -119,7 +119,7 @@ export default class APU {
         );
 
       case AUDIO_REGISTERS.NR14:
-        return this.channel1.enableLengthTimer ? 0x40 : 0;
+        return 0xbf | (this.channel1.enableLengthTimer ? 0x40 : 0);
 
       // Channel 2
       case AUDIO_REGISTERS.NR21:
@@ -133,7 +133,7 @@ export default class APU {
         );
 
       case AUDIO_REGISTERS.NR24:
-        return this.channel2.enableLengthTimer ? 0x40 : 0;
+        return 0xbf | (this.channel2.enableLengthTimer ? 0x40 : 0);
 
       // Channel 3
       case AUDIO_REGISTERS.NR30:
@@ -143,7 +143,7 @@ export default class APU {
         return (this.channel3.outputLevel << 5) | 0x9f;
 
       case AUDIO_REGISTERS.NR34:
-        return this.channel3.enableLengthTimer ? 0x40 : 0;
+        return 0xbf | (this.channel3.enableLengthTimer ? 0x40 : 0);
 
       // Channel 4
       case AUDIO_REGISTERS.NR42:
@@ -161,7 +161,7 @@ export default class APU {
         );
 
       case AUDIO_REGISTERS.NR44:
-        return this.channel4.enableLengthTimer ? 0x7f : 0x3f;
+        return 0xbf | (this.channel4.enableLengthTimer ? 0x40 : 0);
 
       default:
         return 0xff;
