@@ -31,6 +31,8 @@ class MockAudioBuffer {
 
 class MockAudioBufferSourceNode extends MockAudioNode {
   start() {}
+  stop() {}
+  disconnect() {}
   playbackRate = { value: 0 };
 }
 

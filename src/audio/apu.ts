@@ -180,6 +180,9 @@ export default class APU {
   write(address: number, value: number) {
     if (address >= WAVE_RAM_START && address <= WAVE_RAM_END) {
       this.channel3.wave[address - WAVE_RAM_START] = value;
+      if (this.channel3.enabled) {
+        this.channel3.updateWave();
+      }
       return;
     }
 
@@ -300,11 +303,13 @@ export default class APU {
 
       case AUDIO_REGISTERS.NR33:
         this.channel3.periodValue = (this.channel3.periodValue & 0xff00) | value;
+        this.channel3.updateFrequency();
         return;
 
       case AUDIO_REGISTERS.NR34:
         this.channel3.enableLengthTimer = Boolean(value & 0x40);
         this.channel3.periodValue = ((value & 0x07) << 8) | (this.channel3.periodValue & 0x00ff);
+        this.channel3.updateFrequency();
 
         if (value & 0x80) {
           this.channel3.trigger();

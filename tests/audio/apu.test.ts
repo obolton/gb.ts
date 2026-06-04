@@ -619,4 +619,31 @@ describe('APU', () => {
       expect(apu.channel1.initialVolume).toEqual(15);
     });
   });
+
+  describe('wave channel live updates', () => {
+    beforeEach(() => {
+      apu.write(AUDIO_REGISTERS.NR52, 0x80);
+      apu.channel3.dacEnabled = true;
+      apu.channel3.trigger();
+    });
+
+    test('rebuilds the wave when wave RAM changes while playing', () => {
+      const node = apu.channel3.audioBufferSourceNode;
+      apu.write(0xff30, 0x12);
+      expect(apu.channel3.audioBufferSourceNode).not.toBe(node);
+    });
+
+    test('does not rebuild the wave when wave RAM changes while stopped', () => {
+      apu.channel3.disable();
+      const node = apu.channel3.audioBufferSourceNode;
+      apu.write(0xff30, 0x34);
+      expect(apu.channel3.audioBufferSourceNode).toBe(node);
+    });
+
+    test('updates the frequency when the period changes while playing', () => {
+      apu.write(AUDIO_REGISTERS.NR34, 0x00);
+      apu.write(AUDIO_REGISTERS.NR33, 0x00);
+      expect(apu.channel3.audioBufferSourceNode?.playbackRate.value).toEqual(1024 / 48000);
+    });
+  });
 });

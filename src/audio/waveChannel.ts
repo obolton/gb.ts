@@ -35,7 +35,7 @@ export default class WaveChannel extends Channel {
     this.outputLevel = OutputLevel.MUTE;
   }
 
-  trigger() {
+  updateWave() {
     this.audioBufferSourceNode?.disconnect();
     this.audioBufferSourceNode?.stop();
 
@@ -46,17 +46,29 @@ export default class WaveChannel extends Channel {
       buffer[sampleIndex] = ((value & 0xf0) >> 4) / 7.5 - 1;
       buffer[sampleIndex + 1] = (value & 0x0f) / 7.5 - 1;
     }
-    const sampleRate = 2097152 / (2048 - this.periodValue);
     const audioBuffer = this.audioContext.createBuffer(1, 32, this.audioContext.sampleRate);
     audioBuffer.copyToChannel(buffer, 0, 0);
 
     this.audioBufferSourceNode = this.audioContext.createBufferSource();
     this.audioBufferSourceNode.buffer = audioBuffer;
     this.audioBufferSourceNode.loop = true;
-    this.audioBufferSourceNode.playbackRate.value = sampleRate / this.audioContext.sampleRate;
     this.audioBufferSourceNode.start();
     this.audioBufferSourceNode.connect(this.gainNode);
 
+    this.updateFrequency();
+  }
+
+  updateFrequency() {
+    if (!this.audioBufferSourceNode) {
+      return;
+    }
+
+    const sampleRate = 2097152 / (2048 - this.periodValue);
+    this.audioBufferSourceNode.playbackRate.value = sampleRate / this.audioContext.sampleRate;
+  }
+
+  trigger() {
+    this.updateWave();
     super.trigger();
   }
 }
