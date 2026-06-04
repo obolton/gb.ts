@@ -49,11 +49,12 @@ export default class CPU {
         this.ticks += 1;
       }
 
-      this.checkInterrupts();
+      const operationTicks = this.ticks;
+      this.step(operationTicks);
 
-      this.ppu?.step(this.ticks);
-      this.timer?.step(this.ticks);
-      this.serial?.step(this.ticks);
+      const ticksBeforeInterrupts = this.ticks;
+      this.checkInterrupts();
+      this.step(this.ticks - ticksBeforeInterrupts);
 
       frameTicks += this.ticks;
     }
@@ -357,6 +358,12 @@ export default class CPU {
 
       default: return this.invalid(operation);
     }
+  }
+
+  private step(ticks: number) {
+    this.ppu?.step(ticks);
+    this.timer?.step(ticks);
+    this.serial?.step(ticks);
   }
 
   executePrefixed(operation: number) {
@@ -671,6 +678,11 @@ export default class CPU {
       this.registers.halt = false;
     }
 
+    if (interrupts && this.registers.stop) {
+      this.registers.stop = false;
+      this.timer?.resume();
+    }
+
     if (!this.registers.ime) {
       return;
     }
@@ -712,12 +724,14 @@ export default class CPU {
 
     // Speed switch
     if (this.mmu.speed & 0x01) {
+      this.timer?.speedSwitch();
       this.doubleSpeed = !this.doubleSpeed;
       this.mmu.speed = this.doubleSpeed ? 0x80 : 0;
       const interval = this.doubleSpeed ? 8 : 16;
       clearInterval(this.frameInterval || 0);
       this.frameInterval = window.setInterval(this.runFrame.bind(this), interval);
     } else {
+      this.timer?.stop();
       this.registers.stop = true;
     }
     this.ticks += 1;

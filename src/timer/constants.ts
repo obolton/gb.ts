@@ -5,4 +5,4 @@ export const TIMER_REGISTERS = {
   TAC: 0xff07,
 };
 
-export const FREQUENCIES = [256, 4, 16, 64];
+export const TIMA_BITS = [9, 3, 5, 7];

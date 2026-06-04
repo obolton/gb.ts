@@ -1,35 +1,41 @@
 import { Interrupts } from '../cpu/interrupts';
+import { TIMER_REGISTERS, TIMA_BITS } from './constants';
 import type MMU from '../memory/mmu';
 import type APU from '../audio/apu';
-import { TIMER_REGISTERS, FREQUENCIES } from './constants';
 import type { IO } from '../types';
 
 export default class Timer implements IO {
   mmu?: MMU;
   apu?: APU;
 
-  private div = 0;
+  private counter = 0;
   private tima = 0;
   private tma = 0;
   private enabled = false;
   private frequencyMode = 0;
-  private divCycles = 0;
-  private timaCycles = 0;
+  private overflowPending = false;
+  private reloading = false;
+  private stopped = false;
+
+  private get apuBit() {
+    return (this.mmu?.speed ?? 0) & 0x80 ? 13 : 12;
+  }
 
   reset() {
-    this.div = 0;
+    this.counter = 0;
     this.tima = 0;
     this.tma = 0;
     this.enabled = false;
     this.frequencyMode = 0;
-    this.divCycles = 0;
-    this.timaCycles = 0;
+    this.overflowPending = false;
+    this.reloading = false;
+    this.stopped = false;
   }
 
   read(address: number) {
     switch (address) {
       case TIMER_REGISTERS.DIV:
-        return this.div;
+        return (this.counter >> 8) & 0xff;
 
       case TIMER_REGISTERS.TIMA:
         return this.tima;
@@ -46,63 +52,109 @@ export default class Timer implements IO {
   }
 
   write(address: number, value: number) {
+    value &= 0xff;
+
     switch (address) {
       case TIMER_REGISTERS.DIV:
-        if (this.div & 0x10) {
-          this.apu?.step();
-        }
-
-        this.div = 0; // Any writes to DIV reset its value to 0
-        this.divCycles = 0;
-        this.timaCycles = 0;
+        this.setCounter(0);
         return;
 
       case TIMER_REGISTERS.TIMA:
+        if (this.reloading) {
+          return;
+        }
+
         this.tima = value;
+        this.overflowPending = false;
         return;
 
       case TIMER_REGISTERS.TMA:
         this.tma = value;
+        if (this.reloading) {
+          this.tima = value;
+        }
         return;
 
-      case TIMER_REGISTERS.TAC:
+      case TIMER_REGISTERS.TAC: {
+        const oldInput = this.timerInput();
         this.enabled = Boolean(value & 0x04);
         this.frequencyMode = value & 0x03;
+        this.tickTima(oldInput);
         return;
+      }
     }
   }
 
+  stop() {
+    this.setCounter(0);
+    this.stopped = true;
+  }
+
+  resume() {
+    this.stopped = false;
+  }
+
+  speedSwitch() {
+    this.setCounter(0);
+    this.stopped = false;
+  }
+
   step(cycles: number) {
-    this.divCycles += cycles;
-
-    while (this.divCycles >= 64) {
-      const value = (this.div + 1) & 0xff;
-
-      // Step APU on falling edge of bit 4
-      if (this.div & 0x10 && !(value & 0x10)) {
-        this.apu?.step();
-      }
-
-      this.div = value;
-      this.divCycles -= 64;
-    }
-
-    if (!this.enabled) {
+    if (this.stopped) {
       return;
     }
 
-    this.timaCycles += cycles;
-    const frequency = FREQUENCIES[this.frequencyMode];
+    for (let i = 0; i < cycles; i++) {
+      this.stepCycle();
+    }
+  }
 
-    while (this.timaCycles >= frequency) {
-      this.timaCycles -= frequency;
+  private stepCycle() {
+    this.reloading = false;
 
-      if (this.tima < 0xff) {
-        this.tima++;
-      } else {
-        this.tima = this.tma;
-        this.mmu?.requestInterrupt(Interrupts.TIMER);
-      }
+    if (this.overflowPending) {
+      this.overflowPending = false;
+      this.reloading = true;
+      this.tima = this.tma;
+      this.mmu?.requestInterrupt(Interrupts.TIMER);
+    }
+
+    this.setCounter(this.counter + 4);
+  }
+
+  private setCounter(value: number) {
+    const oldApuInput = this.apuInput();
+    const oldTimerInput = this.timerInput();
+
+    this.counter = value & 0xffff;
+
+    if (oldApuInput && !this.apuInput()) {
+      this.apu?.step();
+    }
+
+    this.tickTima(oldTimerInput);
+  }
+
+  private tickTima(oldInput: boolean) {
+    if (oldInput && !this.timerInput()) {
+      this.incrementTima();
+    }
+  }
+
+  private timerInput() {
+    return this.enabled && Boolean(this.counter & (1 << TIMA_BITS[this.frequencyMode]));
+  }
+
+  private apuInput() {
+    return Boolean(this.counter & (1 << this.apuBit));
+  }
+
+  private incrementTima() {
+    if (this.tima < 0xff) {
+      this.tima++;
+    } else {
+      this.tima = 0;
+      this.overflowPending = true;
     }
   }
 }

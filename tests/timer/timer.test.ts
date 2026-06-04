@@ -1,6 +1,7 @@
 import { describe, expect, test, vi } from 'vitest';
 import Timer from '../../src/timer/timer';
-import { FREQUENCIES, TIMER_REGISTERS } from '../../src/timer/constants';
+import { TIMA_BITS, TIMER_REGISTERS } from '../../src/timer/constants';
+import type APU from '../../src/audio/apu';
 import MMU from '../../src/memory/mmu';
 import ExternalMemory from '../../src/memory/externalMemory';
 import MOCK_ROM from '../mocks/rom';
@@ -43,6 +44,25 @@ describe('Timer', () => {
     expect(timer.read(TIMER_REGISTERS.DIV)).toEqual(0x00);
   });
 
+  test('increments TIMA when DIV reset drops the selected timer bit', () => {
+    const timer = new Timer();
+    timer.write(TIMER_REGISTERS.TAC, 0x05);
+    timer.step(2);
+    timer.write(TIMER_REGISTERS.DIV, 0x00);
+    expect(timer.read(TIMER_REGISTERS.TIMA)).toEqual(0x01);
+  });
+
+  test('steps the APU when DIV reset drops the frame sequencer bit', () => {
+    const timer = new Timer();
+    const apu = { step: vi.fn<() => void>() };
+    timer.apu = apu as unknown as APU;
+
+    timer.step(1024);
+    timer.write(TIMER_REGISTERS.DIV, 0x00);
+
+    expect(apu.step).toHaveBeenCalledTimes(1);
+  });
+
   test('writes to the TIMA register', () => {
     const timer = new Timer();
     expect(timer.read(TIMER_REGISTERS.TIMA)).toEqual(0x00);
@@ -64,18 +84,35 @@ describe('Timer', () => {
     expect(timer.read(TIMER_REGISTERS.TAC)).toEqual(0xfe);
   });
 
-  test.each(FREQUENCIES.map((frequency, mode) => [frequency, mode]))(
-    'steps the TIMA register at %i cycles',
-    (frequency, mode) => {
+  test('increments TIMA when TAC disables a high selected timer bit', () => {
+    const timer = new Timer();
+    timer.write(TIMER_REGISTERS.TAC, 0x05);
+    timer.step(2);
+    timer.write(TIMER_REGISTERS.TAC, 0x00);
+    expect(timer.read(TIMER_REGISTERS.TIMA)).toEqual(0x01);
+  });
+
+  test('increments TIMA when TAC switches from a high bit to a low bit', () => {
+    const timer = new Timer();
+    timer.write(TIMER_REGISTERS.TAC, 0x05);
+    timer.step(2);
+    timer.write(TIMER_REGISTERS.TAC, 0x06);
+    expect(timer.read(TIMER_REGISTERS.TIMA)).toEqual(0x01);
+  });
+
+  // Each selected counter bit b falls every 2^(b+1) T-cycles = 2^(b-1) M-cycles.
+  test.each(TIMA_BITS.map((bit, mode) => [1 << (bit - 1), mode]))(
+    'steps the TIMA register every %i M-cycles',
+    (period, mode) => {
       const timer = new Timer();
       timer.write(TIMER_REGISTERS.TAC, 0x04 | mode);
-      timer.step(frequency - 1);
+      timer.step(period - 1);
       expect(timer.read(TIMER_REGISTERS.TIMA)).toEqual(0x00);
       timer.step(1);
       expect(timer.read(TIMER_REGISTERS.TIMA)).toEqual(0x01);
-      timer.step(frequency);
+      timer.step(period);
       expect(timer.read(TIMER_REGISTERS.TIMA)).toEqual(0x02);
-      timer.step(frequency * 2);
+      timer.step(period * 2);
       expect(timer.read(TIMER_REGISTERS.TIMA)).toEqual(0x04);
     }
   );
@@ -87,16 +124,18 @@ describe('Timer', () => {
     expect(timer.read(TIMER_REGISTERS.TIMA)).toEqual(0x00);
   });
 
-  test('resets TIMA to the value of TMA when it overflows', () => {
+  test('reloads TIMA from TMA one M-cycle after it overflows', () => {
     const timer = new Timer();
     timer.write(TIMER_REGISTERS.TIMA, 0xff);
     timer.write(TIMER_REGISTERS.TMA, 0x0f);
     timer.write(TIMER_REGISTERS.TAC, 0x04);
     timer.step(256);
+    expect(timer.read(TIMER_REGISTERS.TIMA)).toEqual(0x00);
+    timer.step(1);
     expect(timer.read(TIMER_REGISTERS.TIMA)).toEqual(0x0f);
   });
 
-  test('requests a timer interrupt when TIMA overflows', () => {
+  test('requests a timer interrupt one M-cycle after TIMA overflows', () => {
     const timer = new Timer();
     const mmu = new MMU();
     mmu.externalMemory = new ExternalMemory(MOCK_ROM);
@@ -106,9 +145,88 @@ describe('Timer', () => {
     timer.write(TIMER_REGISTERS.TAC, 0x04);
     expect(mmu.requestInterrupt).not.toHaveBeenCalled();
     timer.step(256);
+    expect(mmu.requestInterrupt).not.toHaveBeenCalled();
+    timer.step(1);
     expect(mmu.requestInterrupt).toHaveBeenCalledWith({
       flag: 0x04,
       handlerAddress: 0x50,
     });
+  });
+
+  test('cancels a pending overflow reload when TIMA is written during the delay', () => {
+    const timer = new Timer();
+    const mmu = new MMU();
+    mmu.externalMemory = new ExternalMemory(MOCK_ROM);
+    vi.spyOn(mmu, 'requestInterrupt');
+    timer.mmu = mmu;
+
+    timer.write(TIMER_REGISTERS.TIMA, 0xff);
+    timer.write(TIMER_REGISTERS.TMA, 0x0f);
+    timer.write(TIMER_REGISTERS.TAC, 0x04);
+    timer.step(256);
+    timer.write(TIMER_REGISTERS.TIMA, 0x42);
+    timer.step(1);
+
+    expect(timer.read(TIMER_REGISTERS.TIMA)).toEqual(0x42);
+    expect(mmu.requestInterrupt).not.toHaveBeenCalled();
+  });
+
+  test('ignores TIMA writes during the reload cycle', () => {
+    const timer = new Timer();
+    timer.write(TIMER_REGISTERS.TIMA, 0xff);
+    timer.write(TIMER_REGISTERS.TMA, 0x0f);
+    timer.write(TIMER_REGISTERS.TAC, 0x04);
+    timer.step(257);
+    timer.write(TIMER_REGISTERS.TIMA, 0x42);
+    expect(timer.read(TIMER_REGISTERS.TIMA)).toEqual(0x0f);
+  });
+
+  test('copies TMA writes to TIMA during the reload cycle', () => {
+    const timer = new Timer();
+    timer.write(TIMER_REGISTERS.TIMA, 0xff);
+    timer.write(TIMER_REGISTERS.TMA, 0x0f);
+    timer.write(TIMER_REGISTERS.TAC, 0x04);
+    timer.step(257);
+    timer.write(TIMER_REGISTERS.TMA, 0x42);
+    expect(timer.read(TIMER_REGISTERS.TMA)).toEqual(0x42);
+    expect(timer.read(TIMER_REGISTERS.TIMA)).toEqual(0x42);
+  });
+
+  test('does not advance while stopped', () => {
+    const timer = new Timer();
+    timer.write(TIMER_REGISTERS.TAC, 0x05);
+    timer.step(2);
+    timer.stop();
+
+    const div = timer.read(TIMER_REGISTERS.DIV);
+    const tima = timer.read(TIMER_REGISTERS.TIMA);
+    timer.step(1000);
+
+    expect(timer.read(TIMER_REGISTERS.DIV)).toEqual(div);
+    expect(timer.read(TIMER_REGISTERS.TIMA)).toEqual(tima);
+
+    timer.resume();
+    timer.step(64);
+    expect(timer.read(TIMER_REGISTERS.DIV)).not.toEqual(div);
+  });
+
+  test('resets the divider when stopped', () => {
+    const timer = new Timer();
+    timer.step(64);
+    expect(timer.read(TIMER_REGISTERS.DIV)).toEqual(0x01);
+    timer.stop();
+    expect(timer.read(TIMER_REGISTERS.DIV)).toEqual(0x00);
+  });
+
+  test('resets the divider and keeps running on a speed switch', () => {
+    const timer = new Timer();
+    timer.step(64);
+    expect(timer.read(TIMER_REGISTERS.DIV)).toEqual(0x01);
+
+    timer.speedSwitch();
+    expect(timer.read(TIMER_REGISTERS.DIV)).toEqual(0x00);
+
+    timer.step(64);
+    expect(timer.read(TIMER_REGISTERS.DIV)).toEqual(0x01);
   });
 });

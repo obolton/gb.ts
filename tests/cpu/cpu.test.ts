@@ -3,6 +3,7 @@ import CPU from '../../src/cpu/cpu';
 import { Interrupts } from '../../src/cpu/interrupts';
 import { MemoryReference, Register, Register8Bit } from '../../src/cpu/registers';
 import MMU from '../../src/memory/mmu';
+import Timer from '../../src/timer/timer';
 import MockIO from '../mocks/MockIO';
 
 vi.useFakeTimers();
@@ -86,6 +87,31 @@ describe('CPU', () => {
         ticks: 1,
         stop: true,
       });
+    });
+
+    test('stops the timer on low-power entry', () => {
+      const localCpu = new CPU(new MMU());
+      const timer = new Timer();
+      const stop = vi.spyOn(timer, 'stop');
+      localCpu.timer = timer;
+
+      localCpu.execute(0x10);
+
+      expect(stop).toHaveBeenCalled();
+    });
+
+    test('triggers a timer speed switch when requested', () => {
+      const localMmu = new MMU();
+      localMmu.speed = 0x01; // KEY1 prepare-speed-switch bit
+      const localCpu = new CPU(localMmu);
+      const timer = new Timer();
+      const speedSwitch = vi.spyOn(timer, 'speedSwitch');
+      localCpu.timer = timer;
+
+      localCpu.execute(0x10);
+
+      expect(speedSwitch).toHaveBeenCalled();
+      expect(localCpu.doubleSpeed).toBe(true);
     });
 
     test('HALT', () => {
