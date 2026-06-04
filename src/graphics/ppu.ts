@@ -79,8 +79,10 @@ export default class PPU {
   wy = 0;
   wly = 0;
   backgroundPalette = [0, 0, 0, 0];
-  objectPalette0 = [0, 0, 0, 0];
-  objectPalette1 = [0, 0, 0, 0];
+  obp0 = 0;
+  obp1 = 0;
+  objectPalette0Colors = [0, 0, 0, 0];
+  objectPalette1Colors = [0, 0, 0, 0];
 
   // Color
   colorBackgroundPalette = new Uint8Array(64).fill(255);
@@ -140,8 +142,10 @@ export default class PPU {
     this.wy = 0;
     this.wly = 0;
     this.backgroundPalette = [0, 0, 0, 0];
-    this.objectPalette0 = [0, 0, 0, 0];
-    this.objectPalette1 = [0, 0, 0, 0];
+    this.obp0 = 0;
+    this.obp1 = 0;
+    this.objectPalette0Colors = [0, 0, 0, 0];
+    this.objectPalette1Colors = [0, 0, 0, 0];
 
     this.colorBackgroundPalette = new Uint8Array(64).fill(255);
     this.backgroundPaletteIndex = 0x3f;
@@ -207,19 +211,9 @@ export default class PPU {
           this.backgroundPalette[0]
         );
       case GRAPHICS_REGISTERS.OBP0:
-        return (
-          (this.objectPalette0[3] << 6) |
-          (this.objectPalette0[2] << 4) |
-          (this.objectPalette0[1] << 2) |
-          this.objectPalette0[0]
-        );
+        return this.obp0;
       case GRAPHICS_REGISTERS.OBP1:
-        return (
-          (this.objectPalette1[3] << 6) |
-          (this.objectPalette1[2] << 4) |
-          (this.objectPalette1[1] << 2) |
-          this.objectPalette1[0]
-        );
+        return this.obp1;
       case GRAPHICS_REGISTERS.WY:
         return this.wy;
       case GRAPHICS_REGISTERS.WX:
@@ -303,7 +297,8 @@ export default class PPU {
         ];
         return;
       case GRAPHICS_REGISTERS.OBP0:
-        this.objectPalette0 = [
+        this.obp0 = value;
+        this.objectPalette0Colors = [
           0, // Transparent
           (value >> 2) & 0x3,
           (value >> 4) & 0x3,
@@ -311,7 +306,8 @@ export default class PPU {
         ];
         return;
       case GRAPHICS_REGISTERS.OBP1:
-        this.objectPalette1 = [
+        this.obp1 = value;
+        this.objectPalette1Colors = [
           0, // Transparent
           (value >> 2) & 0x3,
           (value >> 4) & 0x3,
@@ -759,7 +755,7 @@ export default class PPU {
     for (let j = 0; j < this.objects.length; j++) {
       const object = this.objects[j];
 
-      const palette = object.paletteFlag ? this.objectPalette1 : this.objectPalette0;
+      const palette = object.paletteFlag ? this.objectPalette1Colors : this.objectPalette0Colors;
       const tileY = object.flipY ? objectSize - (this.ly - object.y) - 1 : this.ly - object.y;
 
       let tileIndex = object.tile;

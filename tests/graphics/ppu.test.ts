@@ -236,28 +236,40 @@ describe('PPU', () => {
     describe('OBP0', () => {
       test('read and write', () => {
         ppu.write(GRAPHICS_REGISTERS.OBP0, 0x18);
-        expect(ppu.objectPalette0).toEqual([0, 2, 1, 0]);
+        expect(ppu.objectPalette0Colors).toEqual([0, 2, 1, 0]);
         expect(ppu.read(GRAPHICS_REGISTERS.OBP0)).toEqual(0x18);
       });
 
-      test('ignores lower two bits', () => {
+      test('keeps lower two bits readable while color 0 remains transparent', () => {
         ppu.write(GRAPHICS_REGISTERS.OBP0, 0x1b);
-        expect(ppu.objectPalette0).toEqual([0, 2, 1, 0]);
-        expect(ppu.read(GRAPHICS_REGISTERS.OBP0)).toEqual(0x18);
+        expect(ppu.objectPalette0Colors).toEqual([0, 2, 1, 0]);
+        expect(ppu.read(GRAPHICS_REGISTERS.OBP0)).toEqual(0x1b);
+      });
+
+      test('reads back 0xff even though color 0 is transparent', () => {
+        ppu.write(GRAPHICS_REGISTERS.OBP0, 0xff);
+        expect(ppu.objectPalette0Colors).toEqual([0, 3, 3, 3]);
+        expect(ppu.read(GRAPHICS_REGISTERS.OBP0)).toEqual(0xff);
       });
     });
 
     describe('OBP1', () => {
       test('read and write', () => {
         ppu.write(GRAPHICS_REGISTERS.OBP1, 0x18);
-        expect(ppu.objectPalette1).toEqual([0, 2, 1, 0]);
+        expect(ppu.objectPalette1Colors).toEqual([0, 2, 1, 0]);
         expect(ppu.read(GRAPHICS_REGISTERS.OBP1)).toEqual(0x18);
       });
 
-      test('ignores lower two bits', () => {
+      test('keeps lower two bits readable while color 0 remains transparent', () => {
         ppu.write(GRAPHICS_REGISTERS.OBP1, 0x1b);
-        expect(ppu.objectPalette1).toEqual([0, 2, 1, 0]);
-        expect(ppu.read(GRAPHICS_REGISTERS.OBP1)).toEqual(0x18);
+        expect(ppu.objectPalette1Colors).toEqual([0, 2, 1, 0]);
+        expect(ppu.read(GRAPHICS_REGISTERS.OBP1)).toEqual(0x1b);
+      });
+
+      test('reads back 0xff even though color 0 is transparent', () => {
+        ppu.write(GRAPHICS_REGISTERS.OBP1, 0xff);
+        expect(ppu.objectPalette1Colors).toEqual([0, 3, 3, 3]);
+        expect(ppu.read(GRAPHICS_REGISTERS.OBP1)).toEqual(0xff);
       });
     });
 
