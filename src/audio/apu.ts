@@ -51,7 +51,11 @@ export default class APU {
     this.channel4 = new NoiseChannel(this.audioContext, this.splitter);
   }
 
-  reset() {
+  enable() {
+    this.enabled = true;
+  }
+
+  disable() {
     this.enabled = false;
     this.leftVolume = 0;
     this.rightVolume = 0;
@@ -60,6 +64,11 @@ export default class APU {
     this.channel3.reset();
     this.channel4.reset();
     this.masterGain.gain.value = 0;
+  }
+
+  reset() {
+    this.disable();
+    this.channel3.wave = new Uint8Array(16);
   }
 
   updateGain() {
@@ -174,6 +183,11 @@ export default class APU {
       return;
     }
 
+    // While disabled, every register except NR52 ignores writes
+    if (!this.enabled && address !== AUDIO_REGISTERS.NR52) {
+      return;
+    }
+
     switch (address) {
       case AUDIO_REGISTERS.NR50:
         this.leftVolume = (value & 0x70) >> 4;
@@ -197,7 +211,11 @@ export default class APU {
         return;
 
       case AUDIO_REGISTERS.NR52:
-        this.enabled = Boolean(value & 0x80);
+        if (value & 0x80) {
+          this.enable();
+        } else {
+          this.disable();
+        }
         this.updateGain();
         return;
 

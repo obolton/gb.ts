@@ -13,6 +13,7 @@ describe('APU', () => {
 
   describe('global registers', () => {
     test('NR50: left and right volume', () => {
+      apu.write(AUDIO_REGISTERS.NR52, 0x80);
       apu.write(AUDIO_REGISTERS.NR50, 0x25);
       expect(apu.leftVolume).toEqual(2);
       expect(apu.leftGain.gain.value).toEqual(3 / 8);
@@ -22,6 +23,7 @@ describe('APU', () => {
     });
 
     test('NR51: panning', () => {
+      apu.write(AUDIO_REGISTERS.NR52, 0x80);
       apu.write(AUDIO_REGISTERS.NR51, 0x97);
       expect(apu.channel1.mixLeft).toBe(true);
       expect(apu.channel1.mixRight).toBe(true);
@@ -34,7 +36,8 @@ describe('APU', () => {
       expect(apu.read(AUDIO_REGISTERS.NR51)).toEqual(0x97);
     });
 
-    test('NR53: sound on/off', () => {
+    test('NR52: sound on/off', () => {
+      apu.write(AUDIO_REGISTERS.NR52, 0x00);
       expect(apu.enabled).toBe(false);
       expect(apu.masterGain.gain.value).toEqual(0);
       apu.write(AUDIO_REGISTERS.NR52, 0x89);
@@ -569,6 +572,51 @@ describe('APU', () => {
     test('mutes the output', () => {
       apu.write(AUDIO_REGISTERS.NR32, 0x00);
       expect(apu.channel3.gainNode.gain.value).toEqual(0);
+    });
+  });
+
+  describe('power off', () => {
+    beforeEach(() => {
+      apu.write(AUDIO_REGISTERS.NR52, 0x80);
+    });
+
+    test('disables the APU', () => {
+      apu.write(AUDIO_REGISTERS.NR52, 0x00);
+      expect(apu.enabled).toBe(false);
+      expect(apu.masterGain.gain.value).toEqual(0);
+    });
+
+    test('clears the channel registers', () => {
+      apu.write(AUDIO_REGISTERS.NR12, 0xf0);
+      expect(apu.channel1.initialVolume).toEqual(15);
+      apu.write(AUDIO_REGISTERS.NR52, 0x00);
+      expect(apu.channel1.initialVolume).toEqual(0);
+      expect(apu.channel1.dacEnabled).toBe(false);
+    });
+
+    test('preserves wave RAM', () => {
+      apu.write(0xff30, 0xab);
+      apu.write(AUDIO_REGISTERS.NR52, 0x00);
+      expect(apu.read(0xff30)).toEqual(0xab);
+    });
+
+    test('ignores register writes while off', () => {
+      apu.write(AUDIO_REGISTERS.NR52, 0x00);
+      apu.write(AUDIO_REGISTERS.NR12, 0xf0);
+      expect(apu.channel1.initialVolume).toEqual(0);
+    });
+
+    test('allows wave RAM writes while off', () => {
+      apu.write(AUDIO_REGISTERS.NR52, 0x00);
+      apu.write(0xff30, 0xcd);
+      expect(apu.read(0xff30)).toEqual(0xcd);
+    });
+
+    test('applies register writes again once powered back on', () => {
+      apu.write(AUDIO_REGISTERS.NR52, 0x00);
+      apu.write(AUDIO_REGISTERS.NR52, 0x80);
+      apu.write(AUDIO_REGISTERS.NR12, 0xf0);
+      expect(apu.channel1.initialVolume).toEqual(15);
     });
   });
 });
