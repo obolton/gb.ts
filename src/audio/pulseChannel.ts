@@ -53,6 +53,7 @@ export default class PulseChannel extends Channel {
     this.periodPaceCount = 0;
     this.periodValue = 0;
     this.waveDuty = 0;
+    this.updateDuty();
   }
 
   set period(value: number) {

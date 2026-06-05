@@ -138,5 +138,21 @@ describe('PulseChannel', () => {
 
       expect(setPeriodicWave.mock.lastCall?.[0]).toBe(wave);
     });
+
+    test('restores the duty cycle 0 waveform on reset', () => {
+      const pulseChannel = new PulseChannel(audioContext, leftOutput, rightOutput);
+      const setPeriodicWave = vi.spyOn(pulseChannel.node, 'setPeriodicWave');
+
+      pulseChannel.waveDuty = 0;
+      pulseChannel.updateDuty();
+      const dutyZeroWave = setPeriodicWave.mock.lastCall?.[0];
+
+      pulseChannel.waveDuty = 3;
+      pulseChannel.updateDuty();
+      pulseChannel.reset();
+
+      expect(pulseChannel.waveDuty).toEqual(0);
+      expect(setPeriodicWave.mock.lastCall?.[0]).toBe(dutyZeroWave);
+    });
   });
 });
