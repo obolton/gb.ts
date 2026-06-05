@@ -1,4 +1,5 @@
 node_modules/
 coverage/
-.DS_Store
 dist/
+.pnpm-store/
+.DS_Store
