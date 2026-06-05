@@ -1,8 +1,9 @@
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import CPU from '../../src/cpu/cpu';
 import { Interrupts } from '../../src/cpu/interrupts';
 import { MemoryReference, Register, Register8Bit } from '../../src/cpu/registers';
 import MMU from '../../src/memory/mmu';
+import PPU from '../../src/graphics/ppu';
 import Timer from '../../src/timer/timer';
 import MockIO from '../mocks/MockIO';
 
@@ -68,6 +69,36 @@ describe('CPU', () => {
   beforeEach(() => {
     reset();
     previousState = getCurrentState();
+  });
+
+  describe('double-speed timing', () => {
+    let cpuTicks = 0;
+    let ppuTicks = 0;
+
+    beforeEach(() => {
+      cpuTicks = 0;
+      ppuTicks = 0;
+      vi.spyOn(mmu, 'read').mockReturnValue(0x00); // every opcode is NOP
+      cpu.timer = { step: (ticks: number) => (cpuTicks += ticks) } as unknown as Timer;
+      cpu.ppu = { step: (ticks: number) => (ppuTicks += ticks) } as unknown as PPU;
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+      cpu.timer = undefined;
+      cpu.ppu = undefined;
+    });
+
+    test('advances the CPU and PPU by one frame at normal speed', () => {
+      cpu.runFrame();
+      expect({ cpuTicks, ppuTicks }).toEqual({ cpuTicks: 17556, ppuTicks: 17556 });
+    });
+
+    test('runs twice the CPU cycles but still one PPU frame in double-speed mode', () => {
+      cpu.doubleSpeed = true;
+      cpu.runFrame();
+      expect({ cpuTicks, ppuTicks }).toEqual({ cpuTicks: 35112, ppuTicks: 17556 });
+    });
   });
 
   describe('instructions', () => {

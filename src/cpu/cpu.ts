@@ -15,6 +15,7 @@ export default class CPU {
   ticks = 0;
   frameInterval: number | null;
   doubleSpeed = false;
+  ppuTickRemainder = 0;
 
   constructor(mmu: MMU) {
     this.mmu = mmu;
@@ -26,19 +27,21 @@ export default class CPU {
     this.registers.reset();
     this.ticks = 0;
     this.doubleSpeed = false;
+    this.ppuTickRemainder = 0;
     clearInterval(this.frameInterval ?? 0);
     this.frameInterval = null;
   }
 
   run() {
     if (!this.frameInterval) {
-      this.frameInterval = window.setInterval(this.runFrame.bind(this), this.doubleSpeed ? 8 : 16);
+      this.frameInterval = window.setInterval(this.runFrame.bind(this), 16);
     }
   }
 
   runFrame() {
     let frameTicks = 0;
-    while (frameTicks < 17556) {
+    const frameLength = this.doubleSpeed ? 35112 : 17556;
+    while (frameTicks < frameLength) {
       this.ticks = 0;
 
       if (!this.registers.stop && !this.registers.halt) {
@@ -361,9 +364,18 @@ export default class CPU {
   }
 
   private step(ticks: number) {
-    this.ppu?.step(ticks);
     this.timer?.step(ticks);
     this.serial?.step(ticks);
+
+    // The PPU keeps running at the normal rate in double-speed mode, so it
+    // advances half as fast as the CPU
+    if (this.doubleSpeed) {
+      const total = ticks + this.ppuTickRemainder;
+      this.ppuTickRemainder = total & 1;
+      this.ppu?.step(total >> 1);
+    } else {
+      this.ppu?.step(ticks);
+    }
   }
 
   executePrefixed(operation: number) {
@@ -727,9 +739,7 @@ export default class CPU {
       this.timer?.speedSwitch();
       this.doubleSpeed = !this.doubleSpeed;
       this.mmu.speed = this.doubleSpeed ? 0x80 : 0;
-      const interval = this.doubleSpeed ? 8 : 16;
-      clearInterval(this.frameInterval || 0);
-      this.frameInterval = window.setInterval(this.runFrame.bind(this), interval);
+      this.ppuTickRemainder = 0;
     } else {
       this.timer?.stop();
       this.registers.stop = true;
