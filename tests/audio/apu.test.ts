@@ -464,6 +464,10 @@ describe('APU', () => {
   });
 
   describe('clock', () => {
+    beforeEach(() => {
+      apu.enabled = true;
+    });
+
     test('steps length timer every 2 ticks', () => {
       vi.spyOn(apu.channel1, 'step');
       vi.spyOn(apu.channel2, 'step');
@@ -603,6 +607,19 @@ describe('APU', () => {
       apu.write(AUDIO_REGISTERS.NR52, 0x00);
       expect(apu.channel1.initialVolume).toEqual(0);
       expect(apu.channel1.dacEnabled).toBe(false);
+    });
+
+    test('resets the frame sequencer', () => {
+      apu.clock = 5;
+      apu.write(AUDIO_REGISTERS.NR52, 0x00);
+      expect(apu.clock).toEqual(0);
+    });
+
+    test('does not advance the frame sequencer while off', () => {
+      apu.write(AUDIO_REGISTERS.NR52, 0x00);
+      apu.step();
+      apu.step();
+      expect(apu.clock).toEqual(0);
     });
 
     test('preserves wave RAM', () => {

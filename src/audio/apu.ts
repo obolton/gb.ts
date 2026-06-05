@@ -56,6 +56,7 @@ export default class APU {
 
   disable() {
     this.enabled = false;
+    this.clock = 0;
     this.leftVolume = 0;
     this.rightVolume = 0;
     this.channel1.reset();
@@ -347,6 +348,10 @@ export default class APU {
   }
 
   step() {
+    if (!this.enabled) {
+      return;
+    }
+
     this.clock++;
 
     if (this.clock % 2 === 0) {
