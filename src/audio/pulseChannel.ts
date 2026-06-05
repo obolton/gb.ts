@@ -6,10 +6,10 @@ const DUTY_HARMONICS = 64;
 
 export default class PulseChannel extends Channel {
   initialPeriodSweepPace = 0;
-  private periodSweepPace = 0;
   periodSweepMode = SweepMode.INCREASE;
   periodSweepSlope = 0;
-  private periodPaceCount = 0;
+  private shadowPeriod = 0;
+  private sweepTimer = 0;
   private periodValue = 0;
 
   waveDuty = 0;
@@ -47,10 +47,10 @@ export default class PulseChannel extends Channel {
   reset() {
     super.reset();
     this.initialPeriodSweepPace = 0;
-    this.periodSweepPace = 0;
     this.periodSweepMode = SweepMode.INCREASE;
     this.periodSweepSlope = 0;
-    this.periodPaceCount = 0;
+    this.shadowPeriod = 0;
+    this.sweepTimer = 0;
     this.periodValue = 0;
     this.waveDuty = 0;
     this.updateDuty();
@@ -66,44 +66,54 @@ export default class PulseChannel extends Channel {
   }
 
   trigger() {
-    this.periodSweepPace = this.initialPeriodSweepPace;
-    this.periodPaceCount = 0;
-
     super.trigger();
 
-    if (this.periodSweepSlope !== 0 && this.nextPeriod() > 0x07ff) {
+    this.shadowPeriod = this.period;
+    this.sweepTimer = this.initialPeriodSweepPace || 0x08;
+
+    if (this.periodSweepSlope !== 0 && this.calculatePeriod() > 0x07ff) {
       this.disable();
     }
   }
 
-  private nextPeriod() {
+  private calculatePeriod() {
     const direction = this.periodSweepMode === SweepMode.INCREASE ? 1 : -1;
-    return Math.floor(this.period + direction * (this.period / (1 << this.periodSweepSlope)));
+    return Math.floor(
+      this.shadowPeriod + direction * (this.shadowPeriod / (1 << this.periodSweepSlope))
+    );
   }
 
   periodSweep() {
-    if (!this.enabled || this.periodSweepPace === 0) {
+    if (!this.enabled) {
       return;
     }
 
-    this.periodPaceCount++;
+    this.sweepTimer--;
 
-    if (this.periodPaceCount >= this.periodSweepPace) {
-      const newPeriod = this.nextPeriod();
+    if (this.sweepTimer > 0) {
+      return;
+    }
 
-      // Disable the period if the new value would overflow even if the slope is disabled
-      if (newPeriod > 0x07ff) {
+    this.sweepTimer = this.initialPeriodSweepPace || 0x08;
+
+    if (this.initialPeriodSweepPace === 0) {
+      return;
+    }
+
+    const newPeriod = this.calculatePeriod();
+
+    if (newPeriod > 0x07ff) {
+      this.disable();
+      return;
+    }
+
+    if (this.periodSweepSlope !== 0) {
+      this.shadowPeriod = newPeriod;
+      this.period = newPeriod;
+
+      if (this.calculatePeriod() > 0x07ff) {
         this.disable();
-        return;
       }
-
-      if (this.periodSweepSlope !== 0) {
-        this.period = newPeriod;
-      }
-
-      // Reload the sweep pace
-      this.periodSweepPace = this.initialPeriodSweepPace;
-      this.periodPaceCount = 0;
     }
   }
 }

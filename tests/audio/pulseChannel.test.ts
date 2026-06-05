@@ -107,6 +107,32 @@ describe('PulseChannel', () => {
       pulseChannel.trigger();
       expect(pulseChannel.enabled).toBe(false);
     });
+
+    test('sweeps from the shadow frequency, not from later period writes', () => {
+      const pulseChannel = new PulseChannel(audioContext, leftOutput, rightOutput);
+      pulseChannel.dacEnabled = true;
+      pulseChannel.initialPeriodSweepPace = 1;
+      pulseChannel.periodSweepMode = SweepMode.INCREASE;
+      pulseChannel.periodSweepSlope = 2;
+      pulseChannel.period = 256;
+      pulseChannel.trigger();
+      pulseChannel.period = 1000;
+      pulseChannel.periodSweep();
+      expect(pulseChannel.period).toEqual(320);
+    });
+
+    test('disables on the second overflow check within a single sweep step', () => {
+      const pulseChannel = new PulseChannel(audioContext, leftOutput, rightOutput);
+      pulseChannel.dacEnabled = true;
+      pulseChannel.initialPeriodSweepPace = 1;
+      pulseChannel.periodSweepMode = SweepMode.INCREASE;
+      pulseChannel.periodSweepSlope = 1;
+      pulseChannel.period = 1024;
+      pulseChannel.trigger();
+      pulseChannel.periodSweep();
+      expect(pulseChannel.period).toEqual(1536);
+      expect(pulseChannel.enabled).toBe(false);
+    });
   });
 
   describe('duty cycle', () => {
