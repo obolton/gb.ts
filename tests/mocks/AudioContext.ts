@@ -39,6 +39,10 @@ class MockAudioBufferSourceNode extends MockAudioNode {
 class MockAudioContext {
   sampleRate = 48000;
 
+  resume() {
+    return Promise.resolve();
+  }
+
   createGain() {
     return new MockGainNode();
   }

@@ -11,6 +11,12 @@ const WAVE = [0, 16, 255, 64, 255, 64, 32, 8, 0, 96, 80, 0, 0, 128, 255, 64];
 describe('APU', () => {
   const apu = new APU();
 
+  test('resumes the audio context', () => {
+    const resume = vi.spyOn(apu.audioContext, 'resume');
+    apu.resume();
+    expect(resume).toHaveBeenCalledTimes(1);
+  });
+
   describe('global registers', () => {
     test('NR50: left and right volume', () => {
       apu.write(AUDIO_REGISTERS.NR52, 0x80);

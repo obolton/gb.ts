@@ -33,6 +33,15 @@ const KEY_MAPPING: { [code: string]: Button } = {
 
   const gameboy = new GameBoy(display);
 
+  function enableAudio() {
+    gameboy.apu.resume().then(() => {
+      window.removeEventListener('pointerdown', enableAudio);
+      window.removeEventListener('keydown', enableAudio);
+    });
+  }
+  window.addEventListener('pointerdown', enableAudio);
+  window.addEventListener('keydown', enableAudio);
+
   // Bind button events
   Object.entries(BUTTON_MAPPING).forEach(([id, button]) => {
     const element = document.getElementById(id);

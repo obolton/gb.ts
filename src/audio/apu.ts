@@ -51,6 +51,10 @@ export default class APU {
     this.channel4 = new NoiseChannel(this.audioContext, this.splitter);
   }
 
+  resume() {
+    return this.audioContext.resume();
+  }
+
   enable() {
     this.enabled = true;
   }
