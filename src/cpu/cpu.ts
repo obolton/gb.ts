@@ -2,6 +2,7 @@ import MMU from '../memory/mmu';
 import PPU from '../graphics/ppu';
 import Timer from '../timer/timer';
 import Serial from '../serial/serial';
+import type Scheduler from '../scheduler/scheduler';
 import { Interrupts } from './interrupts';
 import { toSignedInt } from '../utils';
 import Registers, { Register, Register16Bit, MemoryReference, Register8Bit } from './registers';
@@ -12,15 +13,14 @@ export default class CPU {
   ppu?: PPU;
   timer?: Timer;
   serial?: Serial;
+  scheduler?: Scheduler;
   ticks = 0;
-  frameInterval: number | null;
   doubleSpeed = false;
   ppuTickRemainder = 0;
 
   constructor(mmu: MMU) {
     this.mmu = mmu;
     this.registers = new Registers(mmu);
-    this.frameInterval = null;
   }
 
   reset() {
@@ -28,14 +28,6 @@ export default class CPU {
     this.ticks = 0;
     this.doubleSpeed = false;
     this.ppuTickRemainder = 0;
-    clearInterval(this.frameInterval ?? 0);
-    this.frameInterval = null;
-  }
-
-  run() {
-    if (!this.frameInterval) {
-      this.frameInterval = window.setInterval(this.runFrame.bind(this), 16);
-    }
   }
 
   runFrame() {
@@ -60,11 +52,6 @@ export default class CPU {
       this.step(this.ticks - ticksBeforeInterrupts);
 
       frameTicks += this.ticks;
-    }
-
-    if (this.registers.stop) {
-      clearInterval(this.frameInterval || 0);
-      this.frameInterval = null;
     }
   }
 
@@ -685,12 +672,13 @@ export default class CPU {
     const firedFlags = this.mmu.read(0xff0f) & 0x1f;
     const interrupts = enabledFlags & firedFlags;
 
-    // Resume from HALT
+    // Resume from HALT on any pending, enabled interrupt
     if (interrupts && this.registers.halt) {
       this.registers.halt = false;
     }
 
-    if (interrupts && this.registers.stop) {
+    // Low-power STOP exits on a joypad button press
+    if (firedFlags & Interrupts.JOYPAD.flag && this.registers.stop) {
       this.registers.stop = false;
       this.timer?.resume();
     }
@@ -743,6 +731,7 @@ export default class CPU {
     } else {
       this.timer?.stop();
       this.registers.stop = true;
+      this.scheduler?.pause();
     }
     this.ticks += 1;
   }

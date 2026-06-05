@@ -3597,6 +3597,21 @@ describe('CPU', () => {
       expect(cpu.registers.halt).toEqual(false);
     });
 
+    test('resumes from STOP on a joypad press', () => {
+      mmu.write(0xff0f, Interrupts.JOYPAD.flag);
+      cpu.registers.stop = true;
+      cpu.checkInterrupts();
+      expect(cpu.registers.stop).toEqual(false);
+    });
+
+    test('stays in STOP for a non-joypad interrupt', () => {
+      mmu.write(0xffff, 0xff);
+      mmu.write(0xff0f, Interrupts.VBLANK.flag);
+      cpu.registers.stop = true;
+      cpu.checkInterrupts();
+      expect(cpu.registers.stop).toEqual(true);
+    });
+
     test('services the highest-priority pending interrupt', () => {
       mmu.write(0xffff, 0xff);
       mmu.write(0xff0f, Interrupts.VBLANK.flag | Interrupts.TIMER.flag);

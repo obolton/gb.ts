@@ -1,10 +1,12 @@
 import { Interrupts } from '../cpu/interrupts';
 import type MMU from '../memory/mmu';
+import type Scheduler from '../scheduler/scheduler';
 import { Button, ACTION_BUTTONS, DIRECTION_BUTTONS, INPUT_REGISTER } from './constants';
 import { IO } from '../types';
 
 export default class Input implements IO {
   mmu?: MMU;
+  scheduler?: Scheduler;
 
   buttonStates = [false, false, false, false, false, false];
   selectActionButtons = false;
@@ -64,6 +66,7 @@ export default class Input implements IO {
       (this.selectActionButtons && ACTION_BUTTONS.includes(button))
     ) {
       this.mmu?.requestInterrupt(Interrupts.JOYPAD);
+      this.scheduler?.resume();
     }
   }
 

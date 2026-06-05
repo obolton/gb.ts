@@ -3,6 +3,7 @@ import GameBoy from '../src/gb';
 import AudioContext from './mocks/AudioContext';
 import Canvas from './mocks/Canvas';
 import MOCK_ROM from './mocks/rom';
+import { Button } from '../src/input/constants';
 
 globalThis.AudioContext = AudioContext;
 
@@ -31,11 +32,11 @@ describe('GameBoy', () => {
   });
 
   describe('start', () => {
-    test('runs the CPU and marks the system as running', () => {
-      const run = vi.spyOn(gameboy.cpu, 'run');
+    test('starts the scheduler and marks the system as running', () => {
+      const start = vi.spyOn(gameboy.scheduler, 'start');
       gameboy.start(MOCK_ROM);
       expect(gameboy.running).toBe(true);
-      expect(run).toHaveBeenCalledTimes(1);
+      expect(start).toHaveBeenCalledTimes(1);
     });
 
     test('configures CGB mode from the ROM header', () => {
@@ -63,6 +64,23 @@ describe('GameBoy', () => {
       gameboy.start(MOCK_ROM);
       gameboy.stop();
       expect(reset).toHaveBeenCalled();
+    });
+  });
+
+  describe('scheduling', () => {
+    test('pauses the scheduler when the CPU enters a low-power STOP', () => {
+      gameboy.start(MOCK_ROM);
+      const pause = vi.spyOn(gameboy.scheduler, 'pause');
+      gameboy.cpu.stop();
+      expect(pause).toHaveBeenCalled();
+    });
+
+    test('resumes the scheduler on a joypad press', () => {
+      gameboy.start(MOCK_ROM);
+      const resume = vi.spyOn(gameboy.scheduler, 'resume');
+      gameboy.input.selectActionButtons = true;
+      gameboy.input.buttonDown(Button.A);
+      expect(resume).toHaveBeenCalled();
     });
   });
 

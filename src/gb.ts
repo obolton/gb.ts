@@ -6,6 +6,7 @@ import Timer from './timer/timer';
 import Input from './input/input';
 import Serial from './serial/serial';
 import ExternalMemory from './memory/externalMemory';
+import Scheduler from './scheduler/scheduler';
 
 export default class GameBoy {
   display: HTMLCanvasElement;
@@ -16,6 +17,7 @@ export default class GameBoy {
   timer: Timer;
   input: Input;
   serial: Serial;
+  scheduler: Scheduler;
   externalMemory?: ExternalMemory;
   running = false;
   cgbMode = false;
@@ -50,6 +52,10 @@ export default class GameBoy {
     this.cpu.ppu = this.ppu;
     this.cpu.timer = this.timer;
     this.cpu.serial = this.serial;
+
+    this.scheduler = new Scheduler();
+    this.cpu.scheduler = this.scheduler;
+    this.input.scheduler = this.scheduler;
   }
 
   start(rom: Uint8Array) {
@@ -63,11 +69,12 @@ export default class GameBoy {
     this.cgbMode = this.externalMemory.isCGBCompatible();
     this.ppu.cgbMode = this.cgbMode;
     this.serial.cgbMode = this.cgbMode;
-    this.cpu.run();
+    this.scheduler.start(() => this.cpu.runFrame());
     this.running = true;
   }
 
   stop() {
+    this.scheduler.stop();
     this.mmu.reset();
     this.cpu.reset();
     this.timer.reset();
