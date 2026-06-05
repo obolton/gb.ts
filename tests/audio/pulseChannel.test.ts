@@ -5,10 +5,11 @@ import AudioContext from '../mocks/AudioContext';
 
 describe('PulseChannel', () => {
   const audioContext = new AudioContext();
-  const outputNode = audioContext.createGain();
+  const leftOutput = audioContext.createGain();
+  const rightOutput = audioContext.createGain();
 
   test('sets the frequency', () => {
-    const pulseChannel = new PulseChannel(audioContext, outputNode);
+    const pulseChannel = new PulseChannel(audioContext, leftOutput, rightOutput);
     pulseChannel.period = 1024;
     pulseChannel.trigger();
     expect(pulseChannel.node.frequency.value).toEqual(128);
@@ -19,7 +20,7 @@ describe('PulseChannel', () => {
 
   describe('period sweep', () => {
     test('increases the period if sweep mode is increase', () => {
-      const pulseChannel = new PulseChannel(audioContext, outputNode);
+      const pulseChannel = new PulseChannel(audioContext, leftOutput, rightOutput);
       pulseChannel.dacEnabled = true;
       pulseChannel.initialPeriodSweepPace = 1;
       pulseChannel.periodSweepMode = SweepMode.INCREASE;
@@ -33,7 +34,7 @@ describe('PulseChannel', () => {
     });
 
     test('decreases the period if sweep mode is decrease', () => {
-      const pulseChannel = new PulseChannel(audioContext, outputNode);
+      const pulseChannel = new PulseChannel(audioContext, leftOutput, rightOutput);
       pulseChannel.dacEnabled = true;
       pulseChannel.initialPeriodSweepPace = 1;
       pulseChannel.periodSweepMode = SweepMode.DECREASE;
@@ -47,7 +48,7 @@ describe('PulseChannel', () => {
     });
 
     test('sweeps at the sweep pace', () => {
-      const pulseChannel = new PulseChannel(audioContext, outputNode);
+      const pulseChannel = new PulseChannel(audioContext, leftOutput, rightOutput);
       pulseChannel.dacEnabled = true;
       pulseChannel.initialPeriodSweepPace = 3;
       pulseChannel.periodSweepMode = SweepMode.INCREASE;
@@ -71,7 +72,7 @@ describe('PulseChannel', () => {
     });
 
     test('disables the channel if the period would overflow', () => {
-      const pulseChannel = new PulseChannel(audioContext, outputNode);
+      const pulseChannel = new PulseChannel(audioContext, leftOutput, rightOutput);
       pulseChannel.dacEnabled = true;
       pulseChannel.initialPeriodSweepPace = 1;
       pulseChannel.periodSweepMode = SweepMode.INCREASE;
@@ -86,7 +87,7 @@ describe('PulseChannel', () => {
     });
 
     test('does not adjust the period if the period sweep pace is zero', () => {
-      const pulseChannel = new PulseChannel(audioContext, outputNode);
+      const pulseChannel = new PulseChannel(audioContext, leftOutput, rightOutput);
       pulseChannel.dacEnabled = true;
       pulseChannel.initialPeriodSweepPace = 0;
       pulseChannel.periodSweepMode = SweepMode.INCREASE;
@@ -98,7 +99,7 @@ describe('PulseChannel', () => {
     });
 
     test('disables the channel on trigger if the sweep would overflow', () => {
-      const pulseChannel = new PulseChannel(audioContext, outputNode);
+      const pulseChannel = new PulseChannel(audioContext, leftOutput, rightOutput);
       pulseChannel.dacEnabled = true;
       pulseChannel.periodSweepMode = SweepMode.INCREASE;
       pulseChannel.periodSweepSlope = 1;
@@ -110,7 +111,7 @@ describe('PulseChannel', () => {
 
   describe('duty cycle', () => {
     test('selects a distinct waveform for each duty cycle', () => {
-      const pulseChannel = new PulseChannel(audioContext, outputNode);
+      const pulseChannel = new PulseChannel(audioContext, leftOutput, rightOutput);
       const setPeriodicWave = vi.spyOn(pulseChannel.node, 'setPeriodicWave');
 
       const waves = [0, 1, 2, 3].map((duty) => {
@@ -123,7 +124,7 @@ describe('PulseChannel', () => {
     });
 
     test('reuses the same waveform for a given duty cycle', () => {
-      const pulseChannel = new PulseChannel(audioContext, outputNode);
+      const pulseChannel = new PulseChannel(audioContext, leftOutput, rightOutput);
       const setPeriodicWave = vi.spyOn(pulseChannel.node, 'setPeriodicWave');
 
       pulseChannel.waveDuty = 3;

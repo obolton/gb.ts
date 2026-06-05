@@ -5,8 +5,9 @@ import AudioContext from '../mocks/AudioContext';
 
 describe('Channel', () => {
   const audioContext = new AudioContext();
-  const outputNode = audioContext.createGain();
-  const channel = new Channel(audioContext, outputNode);
+  const leftOutput = audioContext.createGain();
+  const rightOutput = audioContext.createGain();
+  const channel = new Channel(audioContext, leftOutput, rightOutput);
 
   beforeEach(() => {
     channel.dacEnabled = true;
@@ -47,25 +48,28 @@ describe('Channel', () => {
       expect(channel.gainNode.gain.value).toEqual(0);
     });
 
-    test('pans to the left', () => {
+    test('routes to the left output only', () => {
       channel.mixLeft = true;
       channel.mixRight = false;
       channel.trigger();
-      expect(channel.stereoPannerNode.pan.value).toEqual(-1);
+      expect(channel.leftGainNode.gain.value).toEqual(1);
+      expect(channel.rightGainNode.gain.value).toEqual(0);
     });
 
-    test('pans to the center', () => {
+    test('routes to both outputs', () => {
       channel.mixLeft = true;
       channel.mixRight = true;
       channel.trigger();
-      expect(channel.stereoPannerNode.pan.value).toEqual(0);
+      expect(channel.leftGainNode.gain.value).toEqual(1);
+      expect(channel.rightGainNode.gain.value).toEqual(1);
     });
 
-    test('pans to the right', () => {
+    test('routes to the right output only', () => {
       channel.mixLeft = false;
       channel.mixRight = true;
       channel.trigger();
-      expect(channel.stereoPannerNode.pan.value).toEqual(1);
+      expect(channel.leftGainNode.gain.value).toEqual(0);
+      expect(channel.rightGainNode.gain.value).toEqual(1);
     });
   });
 

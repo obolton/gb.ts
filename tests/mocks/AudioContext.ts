@@ -7,10 +7,6 @@ class MockGainNode extends MockAudioNode {
   gain = { value: 0 };
 }
 
-class MockPannerNode extends MockAudioNode {
-  pan = { value: 0 };
-}
-
 class MockOscillatorNode extends MockAudioNode {
   frequency = { value: 0 };
   start() {}
@@ -48,12 +44,6 @@ class MockAudioContext {
   }
   createChannelMerger() {
     return new MockAudioNode();
-  }
-  createChannelSplitter() {
-    return new MockAudioNode();
-  }
-  createStereoPanner() {
-    return new MockPannerNode();
   }
   createOscillator() {
     return new MockOscillatorNode();

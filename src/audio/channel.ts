@@ -23,18 +23,24 @@ export default class Channel {
   volume = 0;
 
   gainNode: GainNode;
-  stereoPannerNode: StereoPannerNode;
+  leftGainNode: GainNode;
+  rightGainNode: GainNode;
 
-  constructor(audioContext: AudioContext, outputNode: AudioNode) {
+  constructor(audioContext: AudioContext, leftOutput: AudioNode, rightOutput: AudioNode) {
     this.audioContext = audioContext;
 
-    this.stereoPannerNode = audioContext.createStereoPanner();
-    this.stereoPannerNode.pan.value = 0;
-    this.stereoPannerNode.connect(outputNode);
+    this.leftGainNode = audioContext.createGain();
+    this.leftGainNode.gain.value = 0;
+    this.leftGainNode.connect(leftOutput);
+
+    this.rightGainNode = audioContext.createGain();
+    this.rightGainNode.gain.value = 0;
+    this.rightGainNode.connect(rightOutput);
 
     this.gainNode = audioContext.createGain();
     this.gainNode.gain.value = 0;
-    this.gainNode.connect(this.stereoPannerNode);
+    this.gainNode.connect(this.leftGainNode);
+    this.gainNode.connect(this.rightGainNode);
   }
 
   reset() {
@@ -65,23 +71,8 @@ export default class Channel {
     const gain = this.outputGain();
     this.gainNode.gain.value =
       this.enabled && this.dacEnabled && (this.mixLeft || this.mixRight) ? gain : 0;
-
-    // Center
-    if (this.mixLeft && this.mixRight) {
-      this.stereoPannerNode.pan.value = 0;
-
-      // Left
-    } else if (this.mixLeft && !this.mixRight) {
-      this.stereoPannerNode.pan.value = -1;
-
-      // Right
-    } else if (!this.mixLeft && this.mixRight) {
-      this.stereoPannerNode.pan.value = 1;
-
-      // Mute
-    } else {
-      this.stereoPannerNode.pan.value = 0;
-    }
+    this.leftGainNode.gain.value = this.mixLeft ? 1 : 0;
+    this.rightGainNode.gain.value = this.mixRight ? 1 : 0;
   }
 
   protected outputGain() {

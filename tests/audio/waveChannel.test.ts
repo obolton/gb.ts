@@ -4,10 +4,11 @@ import AudioContext from '../mocks/AudioContext';
 
 describe('WaveChannel', () => {
   const audioContext = new AudioContext();
-  const outputNode = audioContext.createGain();
+  const leftOutput = audioContext.createGain();
+  const rightOutput = audioContext.createGain();
 
   test('uses a valid buffer rate for very low frequencies', () => {
-    const waveChannel = new WaveChannel(audioContext, outputNode);
+    const waveChannel = new WaveChannel(audioContext, leftOutput, rightOutput);
     waveChannel.periodValue = 0;
     waveChannel.trigger();
     expect(waveChannel.audioBufferSourceNode?.buffer?.sampleRate).toEqual(48000);
@@ -15,7 +16,7 @@ describe('WaveChannel', () => {
   });
 
   test('uses a valid buffer rate for very high frequencies', () => {
-    const waveChannel = new WaveChannel(audioContext, outputNode);
+    const waveChannel = new WaveChannel(audioContext, leftOutput, rightOutput);
     waveChannel.periodValue = 2047;
     waveChannel.trigger();
     expect(waveChannel.audioBufferSourceNode?.buffer?.sampleRate).toEqual(48000);

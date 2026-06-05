@@ -10,7 +10,6 @@ export default class APU {
   masterGain: GainNode;
   leftGain: GainNode;
   rightGain: GainNode;
-  splitter: ChannelSplitterNode;
   merger: ChannelMergerNode;
 
   enabled = false;
@@ -41,14 +40,10 @@ export default class APU {
     this.rightGain.gain.value = 0;
     this.rightGain.connect(this.merger, 0, 1);
 
-    this.splitter = this.audioContext.createChannelSplitter(2);
-    this.splitter.connect(this.leftGain, 0);
-    this.splitter.connect(this.rightGain, 1);
-
-    this.channel1 = new PulseChannel(this.audioContext, this.splitter);
-    this.channel2 = new PulseChannel(this.audioContext, this.splitter);
-    this.channel3 = new WaveChannel(this.audioContext, this.splitter);
-    this.channel4 = new NoiseChannel(this.audioContext, this.splitter);
+    this.channel1 = new PulseChannel(this.audioContext, this.leftGain, this.rightGain);
+    this.channel2 = new PulseChannel(this.audioContext, this.leftGain, this.rightGain);
+    this.channel3 = new WaveChannel(this.audioContext, this.leftGain, this.rightGain);
+    this.channel4 = new NoiseChannel(this.audioContext, this.leftGain, this.rightGain);
   }
 
   resume() {

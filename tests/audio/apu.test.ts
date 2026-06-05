@@ -522,7 +522,8 @@ describe('APU', () => {
 
       apu.write(AUDIO_REGISTERS.NR51, 0x10);
       expect(apu.channel1.gainNode.gain.value).toEqual(1);
-      expect(apu.channel1.stereoPannerNode.pan.value).toEqual(-1);
+      expect(apu.channel1.leftGainNode.gain.value).toEqual(1);
+      expect(apu.channel1.rightGainNode.gain.value).toEqual(0);
 
       apu.write(AUDIO_REGISTERS.NR51, 0x00);
       expect(apu.channel1.gainNode.gain.value).toEqual(0);

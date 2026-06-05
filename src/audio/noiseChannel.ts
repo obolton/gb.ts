@@ -7,8 +7,8 @@ export default class NoiseChannel extends Channel {
 
   node: AudioBufferSourceNode;
 
-  constructor(audioContext: AudioContext, outputNode: AudioNode) {
-    super(audioContext, outputNode);
+  constructor(audioContext: AudioContext, leftOutput: AudioNode, rightOutput: AudioNode) {
+    super(audioContext, leftOutput, rightOutput);
 
     const buffer = new Float32Array(audioContext.sampleRate);
     for (let i = 0; i < buffer.length; i++) {

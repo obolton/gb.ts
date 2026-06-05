@@ -17,8 +17,8 @@ export default class PulseChannel extends Channel {
 
   node: OscillatorNode;
 
-  constructor(audioContext: AudioContext, outputNode: AudioNode) {
-    super(audioContext, outputNode);
+  constructor(audioContext: AudioContext, leftOutput: AudioNode, rightOutput: AudioNode) {
+    super(audioContext, leftOutput, rightOutput);
 
     this.dutyWaves = DUTY_CYCLES.map((duty) => this.createDutyWave(duty));
 
