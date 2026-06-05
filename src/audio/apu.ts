@@ -230,7 +230,7 @@ export default class APU {
 
       case AUDIO_REGISTERS.NR11:
         this.channel1.waveDuty = value >> 6;
-        this.channel1.initialLength = 64 - (value & 0x3f);
+        this.channel1.length = 64 - (value & 0x3f);
         this.channel1.updateDuty();
         return;
 
@@ -259,7 +259,7 @@ export default class APU {
       // Channel 2
       case AUDIO_REGISTERS.NR21:
         this.channel2.waveDuty = value >> 6;
-        this.channel2.initialLength = 64 - (value & 0x3f);
+        this.channel2.length = 64 - (value & 0x3f);
         this.channel2.updateDuty();
         return;
 
@@ -292,7 +292,7 @@ export default class APU {
         return;
 
       case AUDIO_REGISTERS.NR31:
-        this.channel3.initialLength = 256 - value;
+        this.channel3.length = 256 - value;
         return;
 
       case AUDIO_REGISTERS.NR32:
@@ -317,7 +317,7 @@ export default class APU {
 
       // Channel 4
       case AUDIO_REGISTERS.NR41:
-        this.channel4.initialLength = 64 - (value & 0x3f);
+        this.channel4.length = 64 - (value & 0x3f);
         return;
 
       case AUDIO_REGISTERS.NR42:

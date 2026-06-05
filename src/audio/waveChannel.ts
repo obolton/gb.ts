@@ -31,7 +31,6 @@ export default class WaveChannel extends Channel {
   reset() {
     super.reset();
     this.periodValue = 0;
-    this.maxLength = 256;
     this.outputLevel = OutputLevel.MUTE;
   }
 

@@ -85,7 +85,7 @@ describe('APU', () => {
     describe('NR11: length timer and duty cycle', () => {
       test('length timer', () => {
         apu.write(AUDIO_REGISTERS.NR11, 0x13);
-        expect(apu.channel1.initialLength).toEqual(45);
+        expect(apu.channel1.length).toEqual(45);
         expect(apu.read(AUDIO_REGISTERS.NR11)).toEqual(0x3f);
       });
 
@@ -179,7 +179,7 @@ describe('APU', () => {
     describe('NR21: length timer and duty cycle', () => {
       test('length timer', () => {
         apu.write(AUDIO_REGISTERS.NR21, 0x13);
-        expect(apu.channel2.initialLength).toEqual(45);
+        expect(apu.channel2.length).toEqual(45);
         expect(apu.read(AUDIO_REGISTERS.NR21)).toEqual(0x3f);
       });
 
@@ -286,7 +286,7 @@ describe('APU', () => {
 
     test('NR31: length timer', () => {
       apu.write(AUDIO_REGISTERS.NR31, 0x13);
-      expect(apu.channel3.initialLength).toEqual(237);
+      expect(apu.channel3.length).toEqual(237);
       expect(apu.read(AUDIO_REGISTERS.NR31)).toEqual(0xff);
     });
 
@@ -358,7 +358,7 @@ describe('APU', () => {
   describe('channel 4: noise channel', () => {
     test('NR41: length timer', () => {
       apu.write(AUDIO_REGISTERS.NR41, 0x13);
-      expect(apu.channel4.initialLength).toEqual(45);
+      expect(apu.channel4.length).toEqual(45);
       expect(apu.read(AUDIO_REGISTERS.NR41)).toEqual(0xff);
     });
 

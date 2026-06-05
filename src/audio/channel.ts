@@ -9,7 +9,7 @@ export default class Channel {
   mixRight = false;
 
   enableLengthTimer = false;
-  initialLength = 64;
+  maxLength = 64;
   length = 0;
 
   initialEnvelopeSweepMode = SweepMode.INCREASE;
@@ -51,7 +51,6 @@ export default class Channel {
     this.mixRight = false;
 
     this.enableLengthTimer = false;
-    this.initialLength = 64;
     this.length = 0;
 
     this.initialEnvelopeSweepMode = SweepMode.INCREASE;
@@ -82,7 +81,9 @@ export default class Channel {
   trigger() {
     this.enabled = this.dacEnabled;
     this.volume = this.initialVolume;
-    this.length = this.initialLength;
+    if (this.length === 0) {
+      this.length = this.maxLength;
+    }
     this.envelopeSweepMode = this.initialEnvelopeSweepMode;
     this.envelopeSweepPace = this.initialEnvelopeSweepPace;
     this.envelopePaceCount = 0;

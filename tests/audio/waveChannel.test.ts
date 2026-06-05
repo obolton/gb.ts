@@ -22,4 +22,11 @@ describe('WaveChannel', () => {
     expect(waveChannel.audioBufferSourceNode?.buffer?.sampleRate).toEqual(48000);
     expect(waveChannel.audioBufferSourceNode?.playbackRate.value).toEqual(2097152 / 48000);
   });
+
+  test('reloads the length to 256 on trigger if it is zero', () => {
+    const waveChannel = new WaveChannel(audioContext, leftOutput, rightOutput);
+    waveChannel.length = 0;
+    waveChannel.trigger();
+    expect(waveChannel.length).toEqual(256);
+  });
 });

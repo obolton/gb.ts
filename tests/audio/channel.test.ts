@@ -71,6 +71,18 @@ describe('Channel', () => {
       expect(channel.leftGainNode.gain.value).toEqual(0);
       expect(channel.rightGainNode.gain.value).toEqual(1);
     });
+
+    test('reloads the length to the maximum on trigger if it is zero', () => {
+      channel.length = 0;
+      channel.trigger();
+      expect(channel.length).toEqual(64);
+    });
+
+    test('keeps the current length on trigger if it is not zero', () => {
+      channel.length = 20;
+      channel.trigger();
+      expect(channel.length).toEqual(20);
+    });
   });
 
   test('disables', () => {
@@ -89,7 +101,7 @@ describe('Channel', () => {
 
   describe('length timer', () => {
     test('steps if length timer is enabled', () => {
-      channel.initialLength = 64;
+      channel.length = 64;
       channel.enableLengthTimer = true;
       channel.trigger();
       expect(channel.length).toEqual(64);
@@ -100,7 +112,7 @@ describe('Channel', () => {
     });
 
     test('does not step if length timer is disabled', () => {
-      channel.initialLength = 64;
+      channel.length = 64;
       channel.enableLengthTimer = false;
       channel.trigger();
       expect(channel.length).toEqual(64);
@@ -110,7 +122,6 @@ describe('Channel', () => {
 
     test('does not step if channel is disabled', () => {
       channel.disable();
-      channel.initialLength = 64;
       channel.length = 64;
       channel.enableLengthTimer = true;
       channel.step();
@@ -118,7 +129,7 @@ describe('Channel', () => {
     });
 
     test('disables the channel if the length reaches 0', () => {
-      channel.initialLength = 2;
+      channel.length = 2;
       channel.enableLengthTimer = true;
       channel.trigger();
       expect(channel.enabled).toBe(true);
