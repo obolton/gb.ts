@@ -39,6 +39,10 @@ class MockAudioContext {
     return Promise.resolve();
   }
 
+  suspend() {
+    return Promise.resolve();
+  }
+
   createGain() {
     return new MockGainNode();
   }

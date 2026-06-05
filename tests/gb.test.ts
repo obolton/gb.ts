@@ -84,6 +84,26 @@ describe('GameBoy', () => {
     });
   });
 
+  describe('visibility', () => {
+    test('suspends audio when the tab is hidden', () => {
+      gameboy.start(MOCK_ROM);
+      const suspend = vi.spyOn(gameboy.apu, 'suspend');
+      Object.defineProperty(document, 'hidden', { configurable: true, value: true });
+      document.dispatchEvent(new Event('visibilitychange'));
+      expect(suspend).toHaveBeenCalled();
+    });
+
+    test('resumes audio and resyncs the scheduler when the tab is shown', () => {
+      gameboy.start(MOCK_ROM);
+      const resume = vi.spyOn(gameboy.apu, 'resume');
+      const resync = vi.spyOn(gameboy.scheduler, 'resync');
+      Object.defineProperty(document, 'hidden', { configurable: true, value: false });
+      document.dispatchEvent(new Event('visibilitychange'));
+      expect(resume).toHaveBeenCalled();
+      expect(resync).toHaveBeenCalled();
+    });
+  });
+
   describe('game title', () => {
     test('is undefined before a ROM is started', () => {
       expect(gameboy.getGameTitle()).toBeUndefined();

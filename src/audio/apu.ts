@@ -50,6 +50,10 @@ export default class APU {
     return this.audioContext.resume();
   }
 
+  suspend() {
+    return this.audioContext.suspend();
+  }
+
   enable() {
     this.enabled = true;
   }

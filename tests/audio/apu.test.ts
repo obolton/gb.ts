@@ -17,6 +17,12 @@ describe('APU', () => {
     expect(resume).toHaveBeenCalledTimes(1);
   });
 
+  test('suspends the audio context', () => {
+    const suspend = vi.spyOn(apu.audioContext, 'suspend');
+    apu.suspend();
+    expect(suspend).toHaveBeenCalledTimes(1);
+  });
+
   describe('global registers', () => {
     test('NR50: left and right volume', () => {
       apu.write(AUDIO_REGISTERS.NR52, 0x80);

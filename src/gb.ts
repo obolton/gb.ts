@@ -70,10 +70,12 @@ export default class GameBoy {
     this.ppu.cgbMode = this.cgbMode;
     this.serial.cgbMode = this.cgbMode;
     this.scheduler.start(() => this.cpu.runFrame());
+    document.addEventListener('visibilitychange', this);
     this.running = true;
   }
 
   stop() {
+    document.removeEventListener('visibilitychange', this);
     this.scheduler.stop();
     this.mmu.reset();
     this.cpu.reset();
@@ -83,6 +85,19 @@ export default class GameBoy {
     this.ppu.reset();
     this.apu.reset();
     this.running = false;
+  }
+
+  handleEvent(event: Event) {
+    if (event.type !== 'visibilitychange') {
+      return;
+    }
+
+    if (document.hidden) {
+      this.apu.suspend();
+    } else {
+      this.apu.resume();
+      this.scheduler.resync();
+    }
   }
 
   getGameTitle() {

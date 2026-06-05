@@ -64,12 +64,12 @@ describe('Scheduler', () => {
     expect(onFrame).toHaveBeenCalledTimes(5); // MAX_FRAME_DELTA
   });
 
-  test('does not replay time spent hidden', () => {
+  test('resync drops elapsed time instead of replaying it', () => {
     const onFrame = vi.fn<() => void>();
     scheduler.start(onFrame);
 
-    now += FRAME_DURATION * 100; // time passes while hidden; rAF does not fire
-    document.dispatchEvent(new Event('visibilitychange')); // tab becomes visible
+    now += FRAME_DURATION * 100; // e.g. time passes while the tab is hidden
+    scheduler.resync();
 
     tick(FRAME_DURATION);
 

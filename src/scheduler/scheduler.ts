@@ -1,4 +1,3 @@
-
 const FRAME_DURATION = (1000 * 70224) / 4194304;
 const MAX_FRAME_DELTA = FRAME_DURATION * 5;
 
@@ -14,12 +13,10 @@ export default class Scheduler {
     }
 
     this.callback = onFrame;
-    document.addEventListener('visibilitychange', this);
     this.resume();
   }
 
   stop() {
-    document.removeEventListener('visibilitychange', this);
     this.pause();
     this.callback = null;
   }
@@ -56,9 +53,7 @@ export default class Scheduler {
     this.request = requestAnimationFrame(this.frame.bind(this));
   }
 
-  handleEvent(event: Event) {
-    if (event.type === 'visibilitychange' && !document.hidden) {
-      this.lastTime = performance.now();
-    }
+  resync() {
+    this.lastTime = performance.now();
   }
 }
