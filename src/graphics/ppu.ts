@@ -617,7 +617,7 @@ export default class PPU {
 
   getTiles(tileMapAddress: number, row: number, rowInTile: number, max: number): TileAttributes[] {
     if (!this.mmu) {
-      return [];
+      throw new Error('No MMU mounted');
     }
     const tiles = [];
     for (let i = 0; i < max; i++) {
@@ -715,7 +715,7 @@ export default class PPU {
 
   getObjects(): ObjectAttributes[] {
     if (!this.mmu) {
-      return [];
+      throw new Error('No MMU mounted');
     }
 
     const objectSize = this.objectSizeFlag ? 16 : 8;
@@ -810,7 +810,7 @@ export default class PPU {
 
   generalPurposeDma(length: number) {
     if (!this.mmu) {
-      return;
+      throw new Error('No MMU mounted');
     }
     const transferLength = (length + 1) * 0x10;
     const source = this.vramDmaSource & 0xfff0;
@@ -824,7 +824,7 @@ export default class PPU {
 
   hblankDma() {
     if (!this.mmu) {
-      return;
+      throw new Error('No MMU mounted');
     }
     const offset = this.vramDmaProgress * 0x10;
     const source = (this.vramDmaSource & 0xfff0) + offset;
