@@ -16,6 +16,20 @@ describe('Input', () => {
     expect(input.read(INPUT_REGISTER)).toEqual(0xff);
   });
 
+  test('ignores reads and writes to other addresses', () => {
+    const input = new Input();
+    input.write(INPUT_REGISTER, 0x10);
+    input.write(0xff05, 0x20);
+    expect(input.selectActionButtons).toBe(true);
+    expect(input.read(0xff05)).toEqual(0xff);
+  });
+
+  test('returns the action buttons when both groups are selected', () => {
+    const input = new Input();
+    input.write(INPUT_REGISTER, 0x00);
+    expect(input.read(INPUT_REGISTER)).toEqual(0xcf);
+  });
+
   describe('direction butons', () => {
     const input = new Input();
     input.mmu = mmu;
