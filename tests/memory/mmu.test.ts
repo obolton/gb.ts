@@ -163,6 +163,26 @@ describe('MMU', () => {
       mmu.write(0xd000, 0x55);
       expect(mmu.ram[1 * RAM_BANK_SIZE]).toEqual(0x55);
       expect(mmu.read(0xd000)).toEqual(0x55);
+
+      expect(mmu.read(0xf000)).toEqual(0x55);
+      mmu.write(0xf000, 0x66);
+      expect(mmu.read(0xd000)).toEqual(0x66);
+    });
+  });
+
+  describe('guards', () => {
+    test('throws when reading before a cartridge is mounted', () => {
+      expect(() => new MMU().read(0x0000)).toThrow('No external memory mounted');
+    });
+
+    test('throws when writing before a cartridge is mounted', () => {
+      expect(() => new MMU().write(0x0000, 0x00)).toThrow('No external memory mounted');
+    });
+
+    test('throws when reading an unhandled address', () => {
+      const unwired = new MMU();
+      unwired.externalMemory = externalMemory;
+      expect(() => unwired.read(0x8000)).toThrow('Unknown address');
     });
   });
 });
