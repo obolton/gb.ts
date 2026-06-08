@@ -42,7 +42,7 @@ describe('ExternalMemory', () => {
       expect(externalMemory.mbc).toBeInstanceOf(MBC2);
     });
 
-    test.each([0x11, 0x12, 0x13])('MBC3 (%i)', (mbcType) => {
+    test.each([0x0f, 0x10, 0x11, 0x12, 0x13])('MBC3 (%i)', (mbcType) => {
       const rom = new Uint8Array(MOCK_ROM);
       rom[MEMORY_REGISTERS.MBC_TYPE] = mbcType;
       const externalMemory = new ExternalMemory(rom);
@@ -54,6 +54,12 @@ describe('ExternalMemory', () => {
       rom[MEMORY_REGISTERS.MBC_TYPE] = mbcType;
       const externalMemory = new ExternalMemory(rom);
       expect(externalMemory.mbc).toBeInstanceOf(MBC5);
+    });
+
+    test('throws for an unsupported MBC type', () => {
+      const rom = new Uint8Array(MOCK_ROM);
+      rom[MEMORY_REGISTERS.MBC_TYPE] = 0xff;
+      expect(() => new ExternalMemory(rom)).toThrow('Unsupported MBC type');
     });
   });
 });
