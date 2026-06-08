@@ -7,7 +7,7 @@ import ExternalMemory from '../../src/memory/externalMemory';
 import MMU from '../../src/memory/mmu';
 import { GRAPHICS_REGISTERS, SCREEN_WIDTH, COLOR_MAP } from '../../src/graphics/constants';
 import MOCK_ROM from '../mocks/rom';
-import Canvas from '../mocks/Canvas';
+import Canvas, { BlankCanvas } from '../mocks/Canvas';
 import MockIO from '../mocks/MockIO';
 
 describe('PPU', () => {
@@ -21,6 +21,12 @@ describe('PPU', () => {
   const ppu = new PPU(canvas);
   mmu.ppu = ppu;
   ppu.mmu = mmu;
+
+  describe('construction', () => {
+    test('throws when the canvas has no 2D context', () => {
+      expect(() => new PPU(new BlankCanvas())).toThrow('Invalid canvas context');
+    });
+  });
 
   describe('VRAM', () => {
     test('reads and writes to VRAM', () => {
@@ -662,6 +668,21 @@ describe('PPU', () => {
         }
         expect(ppu.mode).toEqual(Mode.OAM_SCAN);
       });
+
+      test('stays in vertical blank when fewer than 114 cycles elapse', () => {
+        ppu.ly = 144;
+        ppu.verticalBlankMode();
+        ppu.step(113);
+        expect(ppu.mode).toEqual(Mode.VERTICAL_BLANK);
+        expect(ppu.ly).toEqual(144);
+      });
+
+      test('does not present a frame while disabled', () => {
+        ppu.enabled = false;
+        const putImageData = vi.spyOn(ppu.context, 'putImageData');
+        ppu.verticalBlankMode();
+        expect(putImageData).not.toHaveBeenCalled();
+      });
     });
 
     describe('OAM scan mode', () => {
@@ -890,10 +911,25 @@ describe('PPU', () => {
         expect(tile.palette).toEqual(0);
       });
 
-      test('returns an empty list without an MMU', () => {
+      test('reads a vertically flipped tile row in CGB mode', () => {
+        ppu.cgbMode = true;
+        ppu.tileDataAreaFlag = true;
+        ppu.vramWrite(0x1800, 1, 0); // tile index (bank 0)
+        ppu.vramWrite(0x1800, 0x40, 1); // attributes: flipY (bank 1)
+        ppu.vramWrite(0x10, 0xaa, 0); // row 0
+        ppu.vramWrite(0x11, 0x00, 0);
+        ppu.vramWrite(0x1e, 0xff, 0); // row 7
+        ppu.vramWrite(0x1f, 0x00, 0);
+
+        const [tile] = ppu.getTiles(0x9800, 0, 0, 1); // rowInTile 0 -> reads row 7
+        expect(tile.flipY).toBe(true);
+        expect(tile.data).toEqual(0x00ff);
+      });
+
+      test('throws without an MMU', () => {
         const saved = ppu.mmu;
         ppu.mmu = undefined;
-        expect(ppu.getTiles(0x9800, 0, 0, 32)).toEqual([]);
+        expect(() => ppu.getTiles(0x9800, 0, 0, 32)).toThrow('No MMU mounted');
         ppu.mmu = saved;
       });
     });
@@ -1020,6 +1056,54 @@ describe('PPU', () => {
         expect(ppu.backgroundPixels[0].color).toEqual(2);
         expect(ppu.wly).toEqual(1);
       });
+
+      test('reads the background from the $9c00 tile map when selected', () => {
+        ppu.backgroundWindowEnabled = true;
+        ppu.tileDataAreaFlag = true;
+        ppu.backgroundTileMapAreaFlag = true; // use the 0x9c00 map
+        ppu.backgroundPalette = [0, 1, 2, 3];
+        ppu.vramWrite(0x1c00, 1, 0); // 0x9c00 map entry 0 -> tile 1
+        ppu.vramWrite(0x10, 0xff, 0);
+        ppu.vramWrite(0x11, 0x00, 0);
+
+        ppu.drawLine();
+
+        expect(ppu.backgroundPixels[0].colorIndex).toEqual(1);
+      });
+
+      test('reads the window from the $9c00 tile map when selected', () => {
+        ppu.backgroundWindowEnabled = true;
+        ppu.windowEnabled = true;
+        ppu.windowTileMapAreaFlag = true; // use the 0x9c00 window map
+        ppu.tileDataAreaFlag = true;
+        ppu.backgroundPalette = [0, 1, 2, 3];
+        ppu.wx = 7;
+        ppu.wy = 0;
+        ppu.ly = 0;
+        ppu.wly = 0;
+        ppu.vramWrite(0x1c00, 2, 0); // 0x9c00 window map entry 0 -> tile 2
+        ppu.vramWrite(2 * 16, 0xff, 0);
+        ppu.vramWrite(2 * 16 + 1, 0x00, 0);
+
+        ppu.drawLine();
+
+        expect(ppu.backgroundPixels[0].colorIndex).toEqual(1);
+      });
+
+      test('horizontally flips a background tile in CGB mode', () => {
+        ppu.cgbMode = true;
+        ppu.backgroundWindowEnabled = true;
+        ppu.tileDataAreaFlag = true;
+        ppu.vramWrite(0x1800, 1, 0); // tile index (bank 0)
+        ppu.vramWrite(0x1800, 0x20, 1); // attributes: flipX (bank 1)
+        ppu.vramWrite(0x10, 0x80, 0); // only the leftmost source pixel set
+        ppu.vramWrite(0x11, 0x00, 0);
+
+        ppu.drawLine();
+
+        expect(ppu.backgroundPixels[7].colorIndex).toEqual(1); // flipped to the right edge
+        expect(ppu.backgroundPixels[0].colorIndex).toEqual(0);
+      });
     });
 
     describe('getObjects', () => {
@@ -1093,10 +1177,10 @@ describe('PPU', () => {
         expect(objects[1].address).toEqual(0xfe04);
       });
 
-      test('returns an empty list without an MMU', () => {
+      test('throws without an MMU', () => {
         const saved = ppu.mmu;
         ppu.mmu = undefined;
-        expect(ppu.getObjects()).toEqual([]);
+        expect(() => ppu.getObjects()).toThrow('No MMU mounted');
         ppu.mmu = saved;
       });
     });
@@ -1226,6 +1310,18 @@ describe('PPU', () => {
 
         expect(ppu.objectPixels[0].color).toEqual(0x1234);
       });
+
+      test('draws an object using the OBP1 palette', () => {
+        ppu.objectPalette1Colors = [0, 3, 2, 1];
+        ppu.ly = 0;
+        placeObject(16, 8, 1, 0x10); // paletteFlag -> OBP1
+        ppu.vramWrite(0x10, 0xff, 0);
+        ppu.vramWrite(0x11, 0x00, 0);
+
+        ppu.drawObjects();
+
+        expect(ppu.objectPixels[0]).toEqual({ colorIndex: 1, color: 3, bgPriority: false });
+      });
     });
 
     describe('renderScanline', () => {
@@ -1337,6 +1433,20 @@ describe('PPU', () => {
 
         expect(ppu.vramRead(0, 0)).toEqual(0xa0);
         expect(ppu.vramDmaProgress).toEqual(1);
+      });
+
+      test('generalPurposeDma throws without an MMU', () => {
+        const saved = ppu.mmu;
+        ppu.mmu = undefined;
+        expect(() => ppu.generalPurposeDma(0)).toThrow('No MMU mounted');
+        ppu.mmu = saved;
+      });
+
+      test('hblankDma throws without an MMU', () => {
+        const saved = ppu.mmu;
+        ppu.mmu = undefined;
+        expect(() => ppu.hblankDma()).toThrow('No MMU mounted');
+        ppu.mmu = saved;
       });
     });
   });
