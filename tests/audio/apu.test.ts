@@ -57,6 +57,28 @@ describe('APU', () => {
       expect(apu.masterGain.gain.value).toEqual(0.25);
       expect(apu.read(AUDIO_REGISTERS.NR52)).toEqual(0xf0);
     });
+
+    test('NR51: reads back every panning bit', () => {
+      apu.write(AUDIO_REGISTERS.NR52, 0x80);
+      apu.write(AUDIO_REGISTERS.NR51, 0xff);
+      expect(apu.read(AUDIO_REGISTERS.NR51)).toEqual(0xff);
+      apu.write(AUDIO_REGISTERS.NR51, 0x00);
+      expect(apu.read(AUDIO_REGISTERS.NR51)).toEqual(0x00);
+    });
+
+    test('NR52: reports the channel power state', () => {
+      apu.write(AUDIO_REGISTERS.NR52, 0x80);
+      apu.channel1.enabled = true;
+      apu.channel2.enabled = true;
+      apu.channel3.enabled = true;
+      apu.channel4.enabled = true;
+      expect(apu.read(AUDIO_REGISTERS.NR52)).toEqual(0xff);
+
+      apu.write(AUDIO_REGISTERS.NR52, 0x00); // powering off disables the channels
+      expect(apu.read(AUDIO_REGISTERS.NR52)).toEqual(0x70);
+
+      apu.write(AUDIO_REGISTERS.NR52, 0x80);
+    });
   });
 
   describe('channel 1: pulse channel with period sweep', () => {
