@@ -99,6 +99,15 @@ describe('CPU', () => {
       cpu.runFrame();
       expect({ cpuTicks, ppuTicks }).toEqual({ cpuTicks: 35112, ppuTicks: 17556 });
     });
+
+    test('idles without fetching opcodes while halted', () => {
+      cpu.registers.halt = true;
+      const pc = cpu.registers.pc;
+      cpu.runFrame();
+      expect(cpu.registers.pc).toEqual(pc); // no opcode fetched while halted
+      expect(cpu.registers.halt).toBe(true);
+      expect(cpuTicks).toEqual(17556);
+    });
   });
 
   describe('instructions', () => {
@@ -143,6 +152,19 @@ describe('CPU', () => {
 
       expect(speedSwitch).toHaveBeenCalled();
       expect(localCpu.doubleSpeed).toBe(true);
+    });
+
+    test('switches back to single speed when already in double-speed', () => {
+      const localMmu = new MMU();
+      localMmu.speed = 0x01; // KEY1 prepare-speed-switch bit
+      const localCpu = new CPU(localMmu);
+      localCpu.doubleSpeed = true;
+      localCpu.timer = new Timer();
+
+      localCpu.execute(0x10);
+
+      expect(localCpu.doubleSpeed).toBe(false);
+      expect(localMmu.speed).toEqual(0);
     });
 
     test('HALT', () => {
@@ -2884,6 +2906,10 @@ describe('CPU', () => {
       [-1],
     ])('invalid opcode', (opcode) => {
       expect(() => cpu.execute(opcode)).toThrow('Invalid opcode');
+    });
+
+    test('invalid prefixed opcode', () => {
+      expect(() => cpu.executePrefixed(-1)).toThrow('Invalid opcode');
     });
 
     describe('flags', () => {
