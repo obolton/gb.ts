@@ -1,7 +1,7 @@
 import { describe, expect, test, vi } from 'vitest';
 import Timer from '../../src/timer/timer';
 import { TIMA_BITS, TIMER_REGISTERS } from '../../src/timer/constants';
-import type APU from '../../src/audio/apu';
+import APU from '../../src/audio/apu';
 import MMU from '../../src/memory/mmu';
 import ExternalMemory from '../../src/memory/externalMemory';
 import MOCK_ROM from '../mocks/rom';
@@ -61,6 +61,22 @@ describe('Timer', () => {
     timer.write(TIMER_REGISTERS.DIV, 0x00);
 
     expect(apu.step).toHaveBeenCalledTimes(1);
+  });
+
+  test('uses frame sequencer bit 13 to step the APU in double-speed mode', () => {
+    const timer = new Timer();
+    const mmu = new MMU();
+    mmu.speed = 0x80; // double speed
+    timer.mmu = mmu;
+
+    const apu = new APU();
+    const step = vi.spyOn(apu, 'step');
+    timer.apu = apu;
+
+    timer.step(2048); // counter reaches bit 13 (0x2000)
+    timer.write(TIMER_REGISTERS.DIV, 0x00); // reset drops bit 13
+
+    expect(step).toHaveBeenCalledTimes(1);
   });
 
   test('writes to the TIMA register', () => {
