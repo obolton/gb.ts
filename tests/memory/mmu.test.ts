@@ -1,5 +1,6 @@
 import { describe, expect, test, vi } from 'vitest';
 import MMU from '../../src/memory/mmu';
+import { RAM_BANK_SIZE } from '../../src/memory/constants';
 import ExternalMemory from '../../src/memory/externalMemory';
 import MOCK_ROM from '../mocks/rom';
 import MockIO from '../mocks/MockIO';
@@ -45,6 +46,18 @@ describe('MMU', () => {
     mmu.write(0xfe00, 0x0a);
     expect(mmu.oam[0]).toEqual(0x0a);
     expect(mmu.read(0xfe00)).toEqual(0x0a);
+  });
+
+  describe('prohibited region (0xFEA0-0xFEFF)', () => {
+    test('reads return 0x00 instead of throwing', () => {
+      expect(mmu.read(0xfea0)).toEqual(0x00);
+      expect(mmu.read(0xfeff)).toEqual(0x00);
+    });
+
+    test('writes are ignored', () => {
+      expect(() => mmu.write(0xfea0, 0x42)).not.toThrow();
+      expect(mmu.read(0xfea0)).toEqual(0x00);
+    });
   });
 
   test('reads and writes to HRAM', () => {
@@ -93,12 +106,63 @@ describe('MMU', () => {
       ppu.read.mockReturnValueOnce(0x02);
       expect(mmu.read(0xff40)).toEqual(0x02);
     });
+
+    test('reads and writes to serial register when mounted', () => {
+      const serial = new MockIO();
+      mmu.serial = serial;
+      mmu.write(0xff01, 0x0a);
+      expect(serial.write).toHaveBeenCalledWith(0xff01, 0x0a);
+      serial.read.mockReturnValueOnce(0x02);
+      expect(mmu.read(0xff01)).toEqual(0x02);
+      mmu.serial = undefined;
+    });
+
+    test('reads and writes the CGB speed register', () => {
+      mmu.write(0xff4d, 0x01);
+      expect(mmu.speed).toEqual(0x01);
+      expect(mmu.read(0xff4d)).toEqual(0x01);
+    });
+
+    test('returns 0xff and ignores writes for an unmapped IO register', () => {
+      expect(() => mmu.write(0xff7f, 0x0a)).not.toThrow();
+      expect(mmu.read(0xff7f)).toEqual(0xff);
+    });
   });
 
   describe('DMA', () => {
     test('copies data to OAM', () => {
       mmu.dma(0x10);
       expect(mmu.oam).toEqual(MOCK_ROM.slice(0x1000, 0x10a0));
+    });
+  });
+
+  describe('WRAM banking', () => {
+    test('selects the WRAM bank via SVBK', () => {
+      mmu.write(0xff70, 0x02);
+      expect(mmu.ramBank).toEqual(0x02);
+      expect(mmu.read(0xff70)).toEqual(0x02);
+    });
+
+    test('reads and writes the switchable WRAM bank', () => {
+      mmu.write(0xff70, 0x02); // select bank 2
+      mmu.write(0xd000, 0x33);
+      expect(mmu.ram[2 * RAM_BANK_SIZE]).toEqual(0x33);
+      expect(mmu.read(0xd000)).toEqual(0x33);
+    });
+
+    test('mirrors the switchable bank through echo RAM', () => {
+      mmu.write(0xff70, 0x03); // select bank 3
+      mmu.write(0xf000, 0x44); // echo of 0xd000
+      expect(mmu.ram[3 * RAM_BANK_SIZE]).toEqual(0x44);
+      expect(mmu.read(0xf000)).toEqual(0x44);
+      expect(mmu.read(0xd000)).toEqual(0x44);
+    });
+
+    test('treats WRAM bank 0 as bank 1', () => {
+      mmu.write(0xff70, 0x00); // bank bits 0 -> defaults to 1
+      mmu.write(0xd000, 0x55);
+      expect(mmu.ram[1 * RAM_BANK_SIZE]).toEqual(0x55);
+      expect(mmu.read(0xd000)).toEqual(0x55);
     });
   });
 });
