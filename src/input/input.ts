@@ -35,7 +35,6 @@ export default class Input implements IO {
     if (this.selectActionButtons) {
       return (
         0xc0 |
-        (this.selectActionButtons ? 0 : 0x20) |
         (this.selectDirectionButtons ? 0 : 0x10) |
         (this.buttonStates[Button.START] ? 0 : 0x08) |
         (this.buttonStates[Button.SELECT] ? 0 : 0x04) |
@@ -47,8 +46,7 @@ export default class Input implements IO {
     if (this.selectDirectionButtons) {
       return (
         0xc0 |
-        (this.selectActionButtons ? 0 : 0x20) |
-        (this.selectDirectionButtons ? 0 : 0x10) |
+        0x20 | // action buttons are not selected in this branch
         (this.buttonStates[Button.DOWN] ? 0 : 0x08) |
         (this.buttonStates[Button.UP] ? 0 : 0x04) |
         (this.buttonStates[Button.LEFT] ? 0 : 0x02) |
