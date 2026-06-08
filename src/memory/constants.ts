@@ -17,6 +17,7 @@ type MemoryType =
   | 'ECHO_RAM_FIXED'
   | 'ECHO_RAM_SWITCHABLE'
   | 'OAM'
+  | 'PROHIBITED'
   | 'IO'
   | 'HRAM'
   | 'IF'
@@ -40,6 +41,7 @@ export const MEMORY_RANGES: Record<MemoryType, AddressRange> = {
   ECHO_RAM_FIXED: { start: 0xe000, end: 0xefff },
   ECHO_RAM_SWITCHABLE: { start: 0xf000, end: 0xfdff },
   OAM: { start: 0xfe00, end: 0xfe9f },
+  PROHIBITED: { start: 0xfea0, end: 0xfeff },
   IO: { start: 0xff00, end: 0xff7f },
   HRAM: { start: 0xff80, end: 0xfffe },
   IF: { start: 0xff0f, end: 0xff0f },

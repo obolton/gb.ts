@@ -79,6 +79,10 @@ export default class MMU {
       return this.oam[address - MEMORY_RANGES.OAM.start];
     }
 
+    if (inRange(address, MEMORY_RANGES.PROHIBITED)) {
+      return 0x00;
+    }
+
     if (inRange(address, MEMORY_RANGES.IO)) {
       if (address === MEMORY_RANGES.SPEED.start) {
         return this.speed;
