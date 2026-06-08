@@ -110,5 +110,24 @@ describe('MBC5', () => {
       mbc.write(0xa000, 0x0f);
       expect(mbc.read(0xa000)).toEqual(0xff);
     });
+
+    test('selects a RAM bank', () => {
+      const mbc = new MBC5(MOCK_ROM);
+      mbc.write(0x4000, 0x03);
+      expect(mbc.ramBank).toEqual(0x03);
+    });
+
+    test('reads and writes independent RAM banks', () => {
+      const mbc = new MBC5(MOCK_ROM);
+      mbc.write(0x0000, 0x0a); // enable RAM
+      mbc.write(0x4000, 0x00); // RAM bank 0
+      mbc.write(0xa000, 0x11);
+      mbc.write(0x4000, 0x03); // RAM bank 3
+      mbc.write(0xa000, 0x22);
+
+      expect(mbc.read(0xa000)).toEqual(0x22);
+      mbc.write(0x4000, 0x00);
+      expect(mbc.read(0xa000)).toEqual(0x11);
+    });
   });
 });

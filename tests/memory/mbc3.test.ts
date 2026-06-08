@@ -96,5 +96,38 @@ describe('MBC3', () => {
       mbc.write(0xa000, 0x0f);
       expect(mbc.read(0xa000)).toEqual(0xff);
     });
+
+    test('selects a RAM bank', () => {
+      const mbc = new MBC3(MOCK_ROM); // 4 RAM banks
+      mbc.write(0x4000, 2);
+      expect(mbc.ramBank).toEqual(2);
+    });
+
+    test('ignores RAM bank writes when the cart has a single RAM bank', () => {
+      const rom = new Uint8Array(MOCK_ROM);
+      rom[MEMORY_REGISTERS.RAM_SIZE] = 2; // 8 KiB -> 1 RAM bank
+      const mbc = new MBC3(rom);
+      mbc.write(0x4000, 2);
+      expect(mbc.ramBank).toEqual(0);
+    });
+
+    test('ignores RTC register selects (values above 0x03)', () => {
+      const mbc = new MBC3(MOCK_ROM);
+      mbc.write(0x4000, 0x08); // RTC register select is unsupported
+      expect(mbc.ramBank).toEqual(0);
+    });
+
+    test('reads and writes independent RAM banks', () => {
+      const mbc = new MBC3(MOCK_ROM);
+      mbc.write(0x0000, 0x0a); // enable RAM
+      mbc.write(0x4000, 0x00); // RAM bank 0
+      mbc.write(0xa000, 0x11);
+      mbc.write(0x4000, 0x02); // RAM bank 2
+      mbc.write(0xa000, 0x22);
+
+      expect(mbc.read(0xa000)).toEqual(0x22);
+      mbc.write(0x4000, 0x00);
+      expect(mbc.read(0xa000)).toEqual(0x11);
+    });
   });
 });

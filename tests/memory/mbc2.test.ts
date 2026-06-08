@@ -33,7 +33,9 @@ describe('MBC2', () => {
 
     test('setting bank 0 defaults to bank 1', () => {
       const mbc = new MBC2(MOCK_ROM);
-      mbc.write(0x2000, 0);
+      mbc.write(0x0100, 3); // bit 8 set -> ROM bank register
+      expect(mbc.romBank).toEqual(3);
+      mbc.write(0x0100, 0); // bank 0 -> 1
       expect(mbc.romBank).toEqual(1);
       expect(mbc.read(0x4000)).toEqual(MOCK_ROM[0x4000]);
     });

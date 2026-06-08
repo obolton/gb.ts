@@ -19,4 +19,9 @@ describe('MBC0', () => {
     externalMemory.write(0x03, 0xff);
     expect(externalMemory.read(0x03)).toEqual(MOCK_ROM[0x03]);
   });
+
+  test('returns 0xff outside the ROM and RAM ranges', () => {
+    const externalMemory = new MBC0(MOCK_ROM);
+    expect(externalMemory.read(0xc000)).toEqual(0xff);
+  });
 });
