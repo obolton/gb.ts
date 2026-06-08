@@ -14,3 +14,11 @@ class MockCanvasElement {
 }
 
 export default MockCanvasElement as unknown as typeof HTMLCanvasElement;
+
+class BlankCanvasElement {
+  getContext() {
+    return null;
+  }
+}
+
+export const BlankCanvas = BlankCanvasElement as unknown as typeof HTMLCanvasElement;
