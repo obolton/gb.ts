@@ -102,6 +102,14 @@ describe('GameBoy', () => {
       expect(resume).toHaveBeenCalled();
       expect(resync).toHaveBeenCalled();
     });
+
+    test('ignores non-visibilitychange events', () => {
+      const suspend = vi.spyOn(gameboy.apu, 'suspend');
+      const resume = vi.spyOn(gameboy.apu, 'resume');
+      gameboy.handleEvent(new Event('click'));
+      expect(suspend).not.toHaveBeenCalled();
+      expect(resume).not.toHaveBeenCalled();
+    });
   });
 
   describe('game title', () => {
